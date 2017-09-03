@@ -1,0 +1,229 @@
+td, th {
+    border: 1px solid burlywood;
+}
+
+table {
+    border-collapse: collapse;
+    font-family: monospace;
+	/*background-color: white;*/
+	margin: auto;
+}
+/*
+tr:hover {
+    background-color: #d6e1e2c9;
+}
+*/
+input.update:focus {
+    outline: 0;
+}
+
+input.update {
+    border: 0;
+    /*width: 95%;*/
+    padding: 2px;
+	border-collapse: collapse;
+    font-family: monospace;
+	margin: 1px 2px;
+}
+
+input.update:hover {
+    outline: 1px solid burlywood;
+	box-shadow: 0px 0px 10px burlywood;
+}
+
+input {
+	/*width: 100%;*/
+}
+
+td.center {
+	text-align: center;
+}
+
+i.fa {
+	background-color: transparent;
+	color: grey;
+}
+
+i.fa:hover {
+	color: burlywood;
+	cursor: pointer;
+}
+
+tr.remove {
+	animation: removed-item-animation 1s cubic-bezier(0.55, -0.04, 0.91, 0.94) forwards;
+    /*transform origin is moved to the bottom left corner*/
+    transform-origin: 0% 100%;
+}
+
+@keyframes removed-item-animation {
+    0% {
+        opacity: 1;
+        transform: rotateZ(0);
+}
+ 
+    100% {
+        opacity: 0;
+        transform: translateY(600px) rotateZ(90deg);
+    }
+}
+
+div#ui-datepicker-div {
+    
+}
+a.ui-state-default {
+    text-decoration: none;
+	color: burlywood;
+}
+
+a.ui-state-default:hover {
+	color: cornflowerblue;
+}
+
+span.ui-icon-circle-triangle-e {
+    float: right;
+}
+
+.ui-datepicker-title {
+    text-align: center;
+}
+
+td[data-handler='selectDay'] {
+    text-align: center;
+}
+
+ul.ui-widget-content {
+    border: 1px solid burlywood;
+    /* background: #eeeeee url(images/ui-bg_highlight-soft_100_eeeeee_1x100.png) 50% top repeat-x; */
+    /* color: #333333; */
+    font-family: monospace;
+    font-size: font-size: small;
+	position: absolute;
+    top: 0;
+    left: 0;
+    cursor: pointer;
+	padding: 10px;
+	background: white;
+}
+
+li.ui-menu .ui-menu-item {
+    list-style: none;
+}
+
+.ui-helper-hidden-accessible {
+    /* border: 0; */
+    /* clip: rect(0 0 0 0); */
+    /* height: 1px; */
+    /* margin: -1px; */
+    overflow: hidden;
+    /* padding: 0; */
+    /* position: absolute; */
+    width: 1px;
+}
+
+div.ui-state-active {
+    /* font-size: 10px; */
+    font-style: bold;
+    /* font-weight: bold; */
+    color: cornflowerblue;
+}
+
+select#id_src {
+	width: 110px;
+	font-size: x-small;
+}
+
+/*
+#id_descr {
+	width: 98%;
+}
+*/
+input#id_url {
+	width: 30px;
+}
+
+#id_currency {
+	width: 32px;
+}
+
+input[col='currency'] {
+    width: 28px;
+}
+
+.smallgrey {
+	color:grey; 
+	font-size: x-small;
+}
+
+table.ui-datepicker-calendar {
+    background: none;
+    /* border: 1px solid; */
+}
+
+.datepicker  {
+	width: 65px;
+}
+
+input[col='status'] {
+	width: 60px;
+}
+
+#id_validation {
+	width: 55px;
+}
+
+#id_lower_price {
+	width: 50px;
+}
+
+#id_upper_price {
+	width: 50px;
+}
+
+div.ui-helper-hidden-accessible {
+	display: none;
+}
+
+div.source {
+    display: inline-block;
+	background-color: wheat;
+}
+
+td.source{
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	padding: 5px 14px 5px 10px;
+	text-align: center;
+}
+
+textarea.source{
+    resize: none;
+	overflow: hidden;
+	background-color: cornsilk;
+    border: none;	
+    width: 100%;
+}
+
+textarea.source:focus{
+    outline:none;
+}
+
+table.source {
+    width: 100%;
+    font-size: large;
+}
+
+input.source {
+    background: cornsilk;
+    border: none;
+    height: 25px;
+	width: 150px;
+	font-size: large;
+}
+
+input.source:focus {
+    outline:none;
+}
+
+input.source#id_url {
+    width: 125px;
+	float: left;
+}

@@ -1,0 +1,44 @@
+<h1>strategies</h1>
+
+{% load verbose_names %}
+
+<table>
+<tr>
+  <th>{% get_verbose company_verbose 'company' %}</th>
+  <th>{% get_verbose company_verbose 'short_name' %}</th>
+  <th>{% get_verbose company_verbose 'ticke
+  r' %}</th>
+  <th>{% get_verbose company_verbose 'country' %}</th>
+  <th>{% get_verbose company_verbose 'type' %}</th>
+  <th>{% get_verbose company_verbose 'remark' %}</th>
+  <th>{% get_verbose company_verbose 'exchange' %}</th>
+</tr>
+
+{% for a in company_all %}
+<tr>
+  <td>{{ a.company }}</td>
+  <td>{{ a.short_name }}</td>
+  <td>{{ a.ticker }}</td>
+  <td>{{ a.country }}</td>
+  <td>{{ a.type }}</td>
+  <td>{{ a.remark }}</td>
+  <td>{{ a.exchange }}</td>
+</tr>
+{% endfor %}
+
+<form action="{% url 'ledger:stocks' %}" method="post" autocomplete="off">
+{% csrf_token %}
+{{ company_form.non_field_errors }}
+<tr>
+  <input type="hidden" name="name" value="company">
+  <th>{{ company_form.company }}</th>
+  <th>{{ company_form.short_name }}</th>
+  <th>{{ company_form.ticker }}</th>
+  <th>{{ company_form.country }}</th>
+  <th>{{ company_form.type }}</th>
+  <th>{{ company_form.remark }}</th>
+  <th></th>
+  <th><input type="submit" value="Submit" /><th>
+</form>
+
+</table>

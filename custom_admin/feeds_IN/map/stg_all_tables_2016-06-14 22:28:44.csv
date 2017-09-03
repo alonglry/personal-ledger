@@ -1,0 +1,4 @@
+action,status,project,model file name,table name,verbose name,verbose name plural,ordering,definition,unicode,model form,backup,retention d,remark
+add,,ledger,stock,stock_dimension ,stock dimension,,,stock dimensions/indicators,self.dim,Y,Y,3,
+add,,ledger,stock,stock_value,stock value,,,stock values,self.date + ' ' + self.ticker,,Y,3,
+add,,ledger,stock,stock_company,stock company,stock companies,,stock companies,self.company + ' (' + self.ticker + ')',Y,Y,3,

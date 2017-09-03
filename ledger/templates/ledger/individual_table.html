@@ -1,0 +1,256 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href={% static 'ledger/css/tables.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src={% static 'ledger/javascript/tables.js' %}></script>
+
+<!--codemirror-->
+<script src="http://codemirror.net/lib/codemirror.js"></script>
+<link rel="stylesheet" href="http://codemirror.net/lib/codemirror.css">
+<script src="http://codemirror.net/mode/python/python.js"></script>
+<script src="http://codemirror.net/addon/edit/matchbrackets.js"></script>
+<style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black; height: 1300px;}</style>
+
+<script type="text/javascript">
+$(document).ready(function(){
+	
+	//update existing table or column
+	$('td[contenteditable]').not('.new').bind('keyup', function() {
+		var _id = $(this).attr('id');
+		var _table = $(this).attr('tab');
+		var _column = $(this).attr('name');
+		var _value = $(this).html();
+		
+		delay(function(){
+			//event.preventDefault();
+			//console.log(_value)
+			update_post(_table,_id,_column,_value);
+			//$('#source_update').submit();
+		}, 100 );
+	});
+	
+	//create new table or column
+	$('i.submit').bind('click', function() {
+		var _table = $(this).attr('tab');
+		
+		create_post(_table);
+	});
+	
+	//delete table or column
+	$('i.delete').bind('click', function() {
+		var _table = $(this).attr('tab');
+		var _id = $(this).attr('id');
+		
+		delete_post(_table,_id);
+	});
+	
+	//create or update function
+	$('textarea').bind('keyup', function() {
+		var _value = $(this).val();
+		var _table = 'functions';
+		var _id = $(this).attr('id');
+		var _column = 'function';
+		
+		if (_id == 'new') {
+			delay(function(){
+				create_post(_table);
+			}, 1000 );
+		} else {
+			update_post(_table,_id,_column,_value);
+		}
+		
+	});
+	
+	var editor = CodeMirror.fromTextArea(document.getElementsByClassName("functions")[0], {
+		mode: {name: "python",
+			   version: 3,
+			   singleLineStringErrors: false},
+		lineNumbers: true,
+		indentUnit: 4,
+		matchBrackets: true
+    });
+	
+	//create or update function
+	editor.on("keyup", function() {
+		var _value = editor.doc.getValue();
+		var _table = 'functions';
+		var _id = $('textarea').attr('id');
+		var _column = 'function';
+		
+		if (_id == 'new') {
+			delay(function(){
+				create_post(_table);
+			}, 1000 );
+		} else {
+			update_post(_table,_id,_column,_value);
+		}
+		
+	});
+		
+});
+
+$(document).ajaxComplete(function () {
+	//update existing table or column
+	$('td[contenteditable]').not('.new').bind('keyup', function() {
+		var _id = $(this).attr('id');
+		var _table = $(this).attr('tab');
+		var _column = $(this).attr('name');
+		var _value = $(this).text();
+		
+		delay(function(){
+			//event.preventDefault();
+			//console.log(_value)
+			update_post(_table,_id,_column,_value);
+			//$('#source_update').submit();
+		}, 100 );
+	});
+	
+	//delete table or column
+	$('i.delete').bind('click', function() {
+		var _table = $(this).attr('tab');
+		var _id = $(this).attr('id');
+		
+		delete_post(_table,_id);
+	});
+});
+
+</script>
+	
+</head>
+
+<body>
+{% include "ledger/links.html" %}
+<div id="message" style="margin:20px;"></div>
+{% for t in tables %}
+<table>
+	<tr>
+		<th nowrap style="background-color: burlywood;">project</th>
+		<th nowrap>file name</th>
+		<th nowrap>table name</th>
+		<th nowrap>verbose name</th>
+		<th nowrap>definition</th>
+		<th nowrap>ordering</th>
+	</tr>
+	<tr class="hovercolor">
+		<td nowrap contenteditable id="{{ t.id }}" name="project" tab="tables">{{ t.project }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="model_file_name" tab="tables">{{ t.model_file_name }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="table_name" tab="tables">{{ t.table_name }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="verbose_name" tab="tables">{{ t.verbose_name }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="definition" tab="tables">{{ t.definition }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="ordering" tab="tables">{{ t.ordering }}</td>
+	</tr>
+	<tr>
+		<th nowrap>form</th>
+		<th nowrap>backup</th>
+		<th nowrap>keep days</th>
+		<th nowrap>plural</th>
+		<th nowrap>unicode</th>
+		<th nowrap>action</th>
+	</tr>
+	<tr class="hovercolor">
+		<td nowrap contenteditable id="{{ t.id }}" name="model_form" tab="tables">{{ t.model_form }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="backup" tab="tables">{{ t.backup }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="retention_d" tab="tables">{{ t.retention_d }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="verbose_name_plural" tab="tables">{{ t.verbose_name_plural }}</td>
+		<td nowrap contenteditable id="{{ t.id }}" name="unicode" tab="tables">{{ t.unicode }}</td>
+		<td nowrap><i id="{{ t.id }}" title="delete table" class="tooltip fa fa-trash-o delete" aria-hidden="true" tab="tables"></i>
+		<i id="{{ t.id }}" title="prepare migration file" class="tooltip fa fa-file-code-o submit" aria-hidden="true" tab="files"></i>
+		</td>
+	</tr>
+</table>
+
+</br>
+<table id='columns'>
+	<tr>
+		<th nowrap>s/n</th>
+		<th nowrap style="background-color: gainsboro;">column name</th>
+		<th nowrap>verbose name</th>
+		<th nowrap>verbose name plural</th>
+		<th nowrap>definition</th>
+		<th nowrap>default value</th>
+		<th nowrap>choice options</th>
+		<th nowrap>data type</th>
+		<th nowrap>min length</th>
+		<th nowrap>max length</th>
+		<th nowrap>decimal place</th>
+		<th nowrap>path</th>
+		<th nowrap>nullable</th>
+		<th nowrap>blank</th>
+		<th nowrap>unique key</th>
+		<th nowrap>model form</th>
+		<th nowrap>foreign key table</th>
+		<th nowrap>foreign key column</th>
+		<th nowrap>foreign key on delete</th>
+		<th nowrap>auto save foreign key</th>
+		<th></th>
+	</tr>
+	{% for c in columns %}
+	{% if c.project = t.project and c.model_file_name = t.model_file_name and c.table_name = t.table_name %}
+	<tr class="hovercolor" id="{{ c.id }}">
+		<td nowrap contenteditable id="{{ c.id }}" name="sn" tab="columns">{{ c.sn }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="column_name" tab="columns">{{ c.column_name }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="verbose_name" tab="columns">{{ c.verbose_name }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="verbose_name_plural" tab="columns">{{ c.verbose_name_plural }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="definition" tab="columns">{{ c.definition }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="default_value" tab="columns">{{ c.default_value }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="choice_options" tab="columns">{{ c.choice_options }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="data_type" tab="columns">{{ c.data_type }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="min_length" tab="columns">{{ c.min_length }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="max_length" tab="columns">{{ c.max_length }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="decimal_place" tab="columns">{{ c.decimal_place }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="path" tab="columns">{{ c.path }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="nullable" tab="columns">{{ c.nullable }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="blank" tab="columns">{{ c.blank }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="unique_key" tab="columns">{{ c.unique_key }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="model_form" tab="columns">{{ c.model_form }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="foreign_key_table" tab="columns">{{ c.foreign_key_table }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="foreign_key_column" tab="columns">{{ c.foreign_key_column }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="foreign_key_on_delete" tab="columns">{{ c.foreign_key_on_delete }}</td>
+		<td nowrap contenteditable id="{{ c.id }}" name="auto_save_foreign_key" tab="columns">{{ c.auto_save_foreign_key }}</td>
+		<td nowrap><i id="{{ c.id }}" class="fa fa-trash-o delete" aria-hidden="true" tab="columns"></i></td>
+	</tr>
+	{% endif %}
+	{% endfor %}
+	<tr class="hovercolor">
+		<td nowrap class="new" contenteditable name="sn"></td>
+		<td nowrap class="new" contenteditable name="column_name"></td>
+		<td nowrap class="new" contenteditable name="verbose_name"></td>
+		<td nowrap class="new" contenteditable name="verbose_name_plural"></td>
+		<td nowrap class="new" contenteditable name="definition"></td>
+		<td nowrap class="new" contenteditable name="default_value"></td>
+		<td nowrap class="new" contenteditable name="choice_options"></td>
+		<td nowrap class="new" contenteditable name="data_type"></td>
+		<td nowrap class="new" contenteditable name="min_length"></td>
+		<td nowrap class="new" contenteditable name="max_length"></td>
+		<td nowrap class="new" contenteditable name="decimal_place"></td>
+		<td nowrap class="new" contenteditable name="path"></td>
+		<td nowrap class="new" contenteditable name="nullable"></td>
+		<td nowrap class="new" contenteditable name="blank"></td>
+		<td nowrap class="new" contenteditable name="unique_key"></td>
+		<td nowrap class="new" contenteditable name="model_form"></td>
+		<td nowrap class="new" contenteditable name="foreign_key_table"></td>
+		<td nowrap class="new" contenteditable name="foreign_key_column"></td>
+		<td nowrap class="new" contenteditable name="foreign_key_on_delete"></td>
+		<td nowrap class="new" contenteditable name="auto_save_foreign_key"></td>
+		<td><i class="fa fa-check-circle-o submit" aria-hidden="true" tab="columns"></i></td>
+	</tr>
+</table>
+
+</br>
+{% if functions %}
+{% for f in functions %}
+<div><textarea id="{{ f.id }}" class="functions" name="functions">{{ f.function }}</textarea></div>
+{% endfor %}
+{% else %}
+<div><textarea id="new" class="functions" name="functions"></textarea></div>
+{% endif %}
+
+{% endfor %}
+
+</body>
+</html>

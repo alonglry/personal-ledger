@@ -1,0 +1,59 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+{% if device == 'phone'%}
+<head>
+	
+	<meta  http-equiv='X-UA-Compatible'  content='IE=edge,chrome=1'>
+	<meta  name='viewport'  content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'>
+	<meta  name='apple-mobile-web-app-capable'  content='yes'>
+	<meta  name='apple-mobile-web-app-status-bar-style'  content='black'>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+  <link rel="stylesheet" type="text/css" href={% static 'ledger/css/card.mobile.css' %}>
+  
+</head>
+
+<body>
+{% include "ledger/links_mobile.html" %}
+  
+<div class='card'>
+	<div class='header'><i class="fa fa-desktop" aria-hidden="true"></i> Use a desktop</div>
+  <div class = 'message'>This page will not support mobile view</div>
+</div>
+    
+</body>
+  
+{% else %}
+
+<head>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+  <link rel="stylesheet" type="text/css" href={% static 'ledger/css/transaction.desk.css' %}>
+  
+</head>
+
+<body>
+{% include "ledger/links.html" %}
+  
+<div class='card'>
+	<form action="{% url 'ledger:transaction' %}" method="post">
+		{% csrf_token %}
+		{{ textbox.non_field_errors }}
+		{{ textbox.input }}
+		<input type="submit" value="Submit"/>
+	</form>
+</div>
+  
+<div class='card'>
+  <p>
+    some
+  </p>
+</div>
+    
+</body>
+  
+{% endif %}  
+</html>

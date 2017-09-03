@@ -1,0 +1,132 @@
+table,tr,td,th {
+	border: 1px solid black;
+	border-collapse: collapse;
+	font-family: monospace;
+}
+
+tr.hovercolor:hover {
+	background-color: #E8F0F1 !important;
+}
+
+td:focus {
+    outline: none;
+}
+
+input {
+    padding: 0px;
+	border: none;
+	width: 100%;
+}
+
+input:focus {
+    background-color: #E8F0F1;
+    outline: none;
+}
+
+i.fa:hover {
+    color: burlywood;
+    cursor: pointer;
+}
+
+.collapse.in {
+    display: block;
+}
+
+.fade {
+  opacity: 0;
+  .transition(opacity .15s linear);
+  &.in {
+    opacity: 1;
+  }
+}
+
+.collapse {
+  display: none;
+
+  &.in      { display: block; }
+  tr&.in    { display: table-row; }
+  tbody&.in { display: table-row-group; }
+}
+
+.collapsing {
+  position: relative;
+  height: 0;
+  overflow: hidden;
+  .transition-property(~"height, visibility");
+  .transition-duration(.35s);
+  .transition-timing-function(ease);
+}
+
+/*
+div.block:hover {
+    background-color: cornsilk;
+}
+*/
+div.block {
+	padding-bottom: 5px;
+    margin-top: 5px;
+    margin-bottom: 5px;
+    padding-top: 5px;
+}
+
+fieldset {
+    margin-bottom: 10px;
+    font-family: monospace;
+    border: 1px solid darkgrey;
+}
+
+textarea {
+    border: 1px solid;
+    width: 95%;
+	min-height: 400px;
+	resize: vertical;
+	padding: 10px;
+	transition: background-color 0.5s ease;
+}
+
+textarea:focus {
+    outline: none;
+    background-color: cornsilk;
+}
+
+div.CodeMirror-focused {
+	background-color: cornsilk;
+	-webkit-box-shadow: inset 0px 91px 72px -101px rgba(0,0,0,0.25);
+	-moz-box-shadow: inset 0px 91px 72px -101px rgba(0,0,0,0.25);
+	box-shadow: inset 0px 91px 72px -101px rgba(0,0,0,0.25);
+}
+
+.tooltip{
+    display: inline;
+    position: relative;
+}
+
+.tooltip:hover:after{
+    background: rgba(222, 184, 135,0.9);
+    border-radius: 5px;
+    bottom: 20px;
+    color: #fff;
+    content: attr(title);
+    left: -100%;
+    padding: 5px 15px;
+    position: absolute;
+    z-index: 98;
+    
+	font-family: monospace;
+}
+/*
+.tooltip:hover:before{
+    border: solid;
+    border-color: #333 transparent;
+    border-width: 6px 6px 0 6px;
+    bottom: 20px;
+    content: "";
+    left: 50%;
+    position: absolute;
+    z-index: 99;
+}
+*/
+
+div#message {
+	font-family: monospace;
+}

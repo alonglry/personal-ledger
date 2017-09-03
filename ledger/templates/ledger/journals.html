@@ -1,0 +1,451 @@
+{% load class_names %}
+{% load staticfiles %}
+
+<!DOCTYPE html>
+{% if device == 'phone'%}
+
+<html>
+<head>
+	
+	{% include "ledger/meta_mobile.html" %}	
+	<script type="text/javascript" src={% static 'ledger/javascript/journals.js' %}></script>
+	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/journals.css' %}>
+	<script type="text/javascript">
+		
+	$(document).ready(function(){
+
+		//submit transition
+		$('div.submit').bind('click', function() {
+			var _id = $(this).attr('id');
+			save(_id);
+		});
+
+		$('input.submit').bind('click', function() {
+			var _id = $(this).attr('id');
+			save(_id);
+		});
+
+		if ($('input[id="id_test_mode"]').is(':checked')) {
+			$("div.form").css("background-color", "darkgrey");
+		}
+
+	});
+
+	$(document).ajaxComplete(function () {
+
+		if ($('input[id="id_test_mode"]').is(':checked')) {
+			$("div.form").css("background-color", "darkgrey");
+		} else {
+			$("div.form").css("background-color", "burlywood");
+		}
+
+		if ($('input[id="id_remove_test"]').is(':checked')) {
+			$('input[id="id_remove_test"]').prop('checked', false);
+		}	
+
+	});
+
+	</script>
+
+</head>
+
+<body>
+{% include "ledger/links_mobile.html" %}
+
+<!-- basic expense form -->
+<div class='form'>
+	<div class='header'>BASIC<span class='message' id='basic'></span></div>	
+	<table>
+		<tr><td>Activities</td><td>
+			<select id="id_choice" name="choice" class='basic'>
+			{% for a in basic_expense%}
+				<option value={{ a }}>{{ a }}</option>
+			{% endfor %}
+			</select>
+		</td></tr>
+		<tr><td>Amount</td><td>{{ basic_form.amount|addclass:'short basic' }}</td></tr>
+		<tr><td>Year</td><td>{{ basic_form.year|addclass:'short basic' }}</td></tr>
+		<tr><td>Month</td><td>{{ basic_form.month|addclass:'short basic' }}</td></tr>
+	</table>
+	<div class='submit' id='basic'>submit</div>
+</div>
+
+<!-- trips form -->
+<div class='form'>
+	<div class='header'>TRIPS<span class='message' id='trips'></span></div>
+	<table>
+		<tr><td>Year</td><td>{{ trips_form.year|addclass:'short trips' }}</td></tr>
+		<tr><td>Month</td><td>{{ trips_form.month|addclass:'short trips' }}</td></tr>
+		<tr><td>Destination</td><td>{{ trips_form.destination|addclass:'medium trips' }}</td></tr>
+		<tr><td>Activities</td><td>{{ trips_form.activities|addclass:'medium trips' }}</td></tr>
+		<tr><td>Amount</td><td>{{ trips_form.amount|addclass:'short trips' }}</td></tr>
+		<tr><td>Currency</td><td>{{ trips_form.currency|addclass:'short trips' }}</td></tr>
+		<tr><td>Exchange Rate</td><td>{{ trips_form.exchange|addclass:'short trips' }}</td></tr>
+		<tr><td>Payment</td><td>{{ trips_form.payment|addclass:'short trips' }}</td></tr>
+		<!--<tr><td>Date</td><td>{{ trips_form.date|addclass:'short trips' }}</td></tr>-->
+	</table>
+	<div class='submit' id='trips'>submit</div>
+</div>
+
+<!-- fundsupermart form -->
+<div class='form'>
+	<div class='header'>FUNDSUPERMART<span class='message' id='fundsupermart'></span></div>
+	<table>
+		<tr><td class = "w119">Activities</td><td>{{ fundsupermart_form.choice|addclass:'short fundsupermart' }}</td></tr>
+		<tr><td>Fund</td><td>{{ fundsupermart_form.fund|addclass:'short fundsupermart' }}</td></tr>
+		<tr><td>Unit</td><td>{{ fundsupermart_form.unit|addclass:'short fundsupermart' }}</td></tr>
+		<tr><td>Amount</td><td>{{ fundsupermart_form.amount|addclass:'short fundsupermart' }}</td></tr>
+		<tr><td>Date</td><td>{{ fundsupermart_form.date|addclass:'short fundsupermart' }}</td></tr>
+	</table>
+	<div class='submit' id='fundsupermart'>submit</div>
+</div>
+
+<!-- SOS form -->
+<div class='form'>
+	<div class='header'>SOS<span class='message' id='sos'></span></div>
+	<table>
+		<tr><td>Activities</td><td>{{ sos_form.choice|addclass:'short sos' }}</td></tr>
+		<tr><td>Amount</td><td>{{ sos_form.amount|addclass:'short sos' }}</td></tr>
+		<tr><td>Unit</td><td>{{ sos_form.unit|addclass:'short sos' }}</td></tr>
+		<tr><td>Date</td><td>{{ sos_form.date|addclass:'short sos' }}</td></tr>
+	</table>
+	<div class='submit' id='sos'>submit</div>
+</div>
+
+<!-- CPF form -->
+<div class='form'>
+	<div class='header'>CPF<span class='message' id='cpf'></span></div>
+	<table>
+		<tr><td class='middle'>Ordinary Account</td><td class='middle'>{{ cpf_form.ordinary|addclass:'short cpf' }}</td></tr>
+		<tr><td class='middle'>Special Account</td><td class='middle'>{{ cpf_form.special|addclass:'short cpf' }}</td></tr>
+		<tr><td class='middle'>MediSave Account</td><td class='middle'>{{ cpf_form.medisave|addclass:'short cpf' }}</td></tr>
+		<tr><td class='middle'>MediShild</td><td class='middle'>{{ cpf_form.medishield|addclass:'short cpf' }}</td></tr>
+		<tr><td class='middle'>Dependants' Protection Scheme</td><td class='middle'>{{ cpf_form.dps|addclass:'short cpf' }}</td></tr>
+		<tr><td class='middle'>Date</td><td class='middle'>{{ cpf_form.date|addclass:'short cpf' }}</td></tr>
+	</table>
+	<div class='submit' id='cpf'>submit</div>
+</div>
+
+<!-- settings -->
+<div class='form'>
+	<div class='header'>SETTING<span class='message' id='setting'></span></div>
+	<table>
+		<tr><td class = "w119 vam">Test Mode</td>
+		<td class = "w100 vam">{{ setting_form.test_mode|addclass:'cmn-toggle cmn-toggle-round-flat submit' }}<label for="id_test_mode"></label></td>
+		<td class = "w100 vam"><span class='message' id='id_test_mode'></span></td>
+		</tr>
+		<tr><td class = "w119 vam">Remove Test</td>
+		<td class = "w100 vam">{{ setting_form.remove_test|addclass:'cmn-toggle cmn-toggle-round-flat submit' }}<label for="id_remove_test"></label></td>
+		<td class = "w100 vam"><span class='message' id='id_remove_test'></span></td>
+		</tr>
+	</table>
+</div>
+
+</body>
+</html>
+
+{% else %}
+
+<html>
+<head>
+
+<style>
+table.journal {
+    border-collapse: collapse;
+	font-family: monospace;
+	margin: 5px;
+}
+
+table.journal, td.journal, th.journal, th.journal {
+    border: 1px solid black;
+}
+
+div.form {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    margin: 5px;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	background: wheat;
+    padding: 5px;
+}
+
+input.short {
+	width: 80px
+}
+
+input.medium {
+	width: 160px
+}
+
+input[type="submit"] {
+	border:1px solid wheat;
+	background: none;
+	color: burlywood;
+	-webkit-transition: color .3s,box-shadow .3s;
+    -moz-transition: color .3s,box-shadow .3s;
+    transition: color .3s,box-shadow .3s, background-color 1s, border-radius 0s;
+}
+
+input[type="submit"]:hover {
+	color: cornflowerblue;
+	cursor: pointer;
+	background-color: cornsilk;
+    border-radius: 5px;
+	border: 1px solid;
+}
+
+input[type="submit"]:focus {
+	outline:0;
+	/*background-color: cornsilk;
+    padding: 4px 20px;
+    border-radius: 5px;*/
+}
+
+</style>
+		
+</head>
+
+<body>
+{% include "ledger/links.html" %}
+
+<h1>journals</h1>
+
+<!-- recent postings -->
+{% if journals %}
+<table class = 'journal'>
+	<tr class = 'journal'>
+	<th class = 'journal'>ID</th>
+	<th class = 'journal'>date</th>
+	<th class = 'journal'>account</th>
+	<th class = 'journal'>ledger account</th>
+	<th class = 'journal'>ledger type</th>
+	<th class = 'journal'>activity</th>
+	<th class = 'journal'>category</th>
+	<th class = 'journal'>currency</th>
+	<th class = 'journal'>amount</th>
+	<th class = 'journal'>reference</th>
+	<th class = 'journal'>journal id</th>
+	<th class = 'journal'>owner</th>
+	<th class = 'journal'>post indicator</th>
+	<th class = 'journal'>test indicator</th>
+</tr>
+
+{% for a in journals %}
+<tr class = 'journal' onmouseover="this.style.backgroundColor='#d6e1e2c9';" onmouseout="this.style.backgroundColor='#ffffff';" style="background-color: rgb(255, 255, 255);">
+	<td class = 'journal'>{{ a.id }}</td>
+	<td class = 'journal'>{{ a.date }}</td>
+	<td class = 'journal'>{{ a.account }}</td>
+	<td class = 'journal'>{{ a.gl_account }}</td>
+	<td class = 'journal'>{{ a.balancesheet_type }}</td>
+	<td class = 'journal'>{{ a.activity }}</td>
+	<td class = 'journal'>{{ a.activity_category }}</td>
+	<td class = 'journal'>{{ a.currency }}</td>
+	<td class = 'journal'>{{ a.amount }}</td>
+	<td class = 'journal'>{{ a.reference }}</td>
+	<td class = 'journal'>{{ a.journal_id }}</td>
+	<td class = 'journal'>{{ a.owner }}</td>
+	<td class = 'journal'>{{ a.post_indicator }}</td>
+	<td class = 'journal'>{{ a.test }}</td>
+</tr>
+{% endfor %}
+
+</table>
+{% endif %}
+
+<!-- basic expense form -->
+<div class='form'>
+	<table>
+		<tr><td>basic</td></tr>
+		<tr><td>
+			<form action="{% url 'ledger:basic' %}" method="post">
+			{% csrf_token %}
+			<table>
+				<tr><td>Activities</td><td>
+					<select id="id_choice" name="choice">
+					{% for a in basic_expense%}
+						<option value={{ a }}>{{ a }}</option>
+					{% endfor %}
+					</select>
+				</td></tr>
+				<tr><td>Amount</td><td>{{ basic_form.amount|addclass:'short' }}</td></tr>
+				<tr><td>Date</td><td>{{ basic_form.date|addclass:'short' }} <input type="submit" value="Submit" /></td></tr>
+			</table>
+			</form>
+		</td></tr>
+	</table>
+</div>
+
+<!-- vickers form -->
+<div class='form'>
+	<table>
+		<tr><td>vickers</td></tr>
+		<tr><td>
+			<form action="{% url 'ledger:vickers' %}" method="post">
+			{% csrf_token %}
+			<table>
+				<tr><td>Activities</td><td>{{ vickers_form.choice }}</td><td>Ticker</td><td>{{ vickers_form.ticker|addclass:'short' }}</td></tr>
+				<tr><td>Unit</td><td>{{ vickers_form.unit|addclass:'short' }}</td><td>Price</td><td>{{ vickers_form.price|addclass:'short' }}</td></tr>
+				<tr><td>Date</td><td>{{ vickers_form.date|addclass:'short' }}</td><td></td><td><input type="submit" value="Submit" /></td></tr>
+			</table>
+			</form>
+		</td></tr>
+	</table>
+</div>
+
+<!-- fundsupermart form -->
+<div class='form'>
+	<table>
+		<tr><td>fundsupermart</td></tr>
+		<tr><td>
+			<form action="{% url 'ledger:fundsupermart' %}" method="post">
+			{% csrf_token %}
+			<table>
+				<tr><td>Activities</td><td>{{ fundsupermart_form.choice }}</td><td>Fund</td><td>{{ fundsupermart_form.fund|addclass:'short' }}</td></tr>
+				<tr><td>Unit</td><td>{{ fundsupermart_form.unit|addclass:'short' }}</td><td>Amount</td><td>{{ fundsupermart_form.amount|addclass:'short' }}</td></tr>
+				<tr><td>Date</td><td>{{ fundsupermart_form.date|addclass:'short' }}</td><td></td><td><input type="submit" value="Submit" /></td></tr>
+			</table>
+			</form>
+		</td></tr>
+	</table>
+</div>
+
+<div class='form'>
+	<table>
+		<tr><td>DBS SOS</td></tr>
+		<tr><td>
+			<form action="{% url 'ledger:sos' %}" method="post">
+			{% csrf_token %}
+			<table>
+				<tr><td>Activities</td><td>{{ sos_form.choice }}</td><td></td><td></td></tr>
+				<tr><td>Unit</td><td>{{ sos_form.unit|addclass:'short' }}</td><td>Amount</td><td>{{ sos_form.amount|addclass:'short' }}</td></tr>
+				<tr><td>Date</td><td>{{ sos_form.date|addclass:'short' }}</td><td></td><td><input type="submit" value="Submit" /></td></tr>
+			</table>
+			</form>
+		</td></tr>
+	</table>
+</div>
+
+<!-- journal form -->
+<div class='form'>
+	<table>
+		<tr><td>journal</td></tr>
+		<tr><td>
+			<form action="{% url 'ledger:journal_journal_form' %}" method="post">
+			{% csrf_token %}
+			{{ journal_form.non_field_errors }}
+
+			<table>
+				<tr>
+					<td>activity</td>
+					<td>{{ journal_form.activity|addclass:'medium' }}</td>
+					<td>{{ journal_form.activity_category|addclass:'medium' }}</td>
+				</tr>
+				<tr>
+					<td></td>
+					<td>Entry One</td>
+					<td>Entry Two</td>
+				</tr>
+				<tr>
+					<td>Account</td>
+					<td>{{ journal_form.account_id_1|addclass:'medium' }}</td>
+					<td>{{ journal_form.account_id_2|addclass:'medium' }}</td>
+				</tr>
+				<tr>
+					<td>Ledegr Account</td>
+					<td>{{ journal_form.gl_account_1|addclass:'medium' }}</td>
+					<td>{{ journal_form.gl_account_2|addclass:'medium' }}</td>
+				</tr>
+				<tr>
+					<td>Balance sheet</td>
+					<td>{{ journal_form.balancesheet_type_1 }}</td>
+					<td>{{ journal_form.balancesheet_type_2 }}</td>
+				</tr>
+				<tr>
+					<td>Reference</td>
+					<td>{{ journal_form.reference|addclass:'medium' }}</td>
+					<td>{{ journal_form.journal_id|addclass:'medium' }}</td>
+				</tr>
+				<tr>
+					<td>Amount</td>
+					<td>{{ journal_form.amount|addclass:'medium' }}</td>
+					<td>{{ journal_form.currency|addclass:'medium' }}</td>
+				</tr>
+				<tr>
+					<td>Date</td>
+					<td>{{ journal_form.date|addclass:'medium' }}</td>
+					<td><input type="submit" value="Submit" /></td>
+				</td>
+			</table>
+			</form>
+		</td></tr>
+	</table>
+</div>
+
+<div class='form'>
+	<table>
+		<tr><td>CPF</td></tr>
+		<tr><td>
+			<form action="{% url 'ledger:cpf' %}" method="post">
+			{% csrf_token %}
+			{{ cpf_form.non_field_errors }}
+
+			<table>
+				<tr>
+					<td>Ordinary Account</td>
+					<td>Special Account</td>
+					<td>MediSave Account</td>
+				</tr>
+				<tr>
+					<td>{{ cpf_form.ordinary|addclass:'medium' }}</td>
+					<td>{{ cpf_form.special|addclass:'medium' }}</td>
+					<td>{{ cpf_form.medisave|addclass:'medium' }}</td>
+				</tr>
+				<tr>
+					<td>MediShild</td>
+					<td>{{ cpf_form.medishield|addclass:'medium' }}</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Dependants' Protection Scheme</td>
+					<td>{{ cpf_form.dps|addclass:'medium' }}</td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>Date</td>
+					<td>{{ cpf_form.date|addclass:'medium' }}</td>
+					<td><input type="submit" value="Submit" /></td>
+				</tr>
+			</table>
+			</form>
+		</td></tr>
+	</table>
+</div>
+
+<!-- trips form -->
+<div class='form'>
+	<table>
+		<tr><td>trips</td></tr>
+		<tr><td>
+			<form action="{% url 'ledger:trips' %}" method="post">
+			{% csrf_token %}
+			{{ trips_form.non_field_errors }}
+			
+			<table>
+				<tr><td>Destination</td><td>{{ trips_form.destination|addclass:'medium' }}</td></tr>
+				<tr><td>Activities</td><td>{{ trips_form.activities|addclass:'medium' }}</td></tr>
+				<tr><td>Amount</td><td>{{ trips_form.amount|addclass:'short' }}</td></tr>
+				<tr><td>Currency</td><td>{{ trips_form.currency|addclass:'short' }}</td></tr>
+				<tr><td>exchange rate</td><td>{{ trips_form.exchange|addclass:'short' }}</td></tr>
+				<tr><td>payment</td><td>{{ trips_form.payment|addclass:'short' }}</td></tr>
+				<tr><td>Date</td><td>{{ trips_form.date|addclass:'short' }} <input type="submit" value="Submit" /></td></tr>
+			</table>
+			</form>
+		</td></tr>
+	</table>
+</div>
+
+</body>
+</html>
+
+{% endif %}

@@ -1,0 +1,33 @@
+<h1>GL information</h1>
+<table>
+<tr>
+  <th>GL account</th>
+  <th>type</th>
+  <th>asset type</th>
+  <th>holder</th>
+  <th>source</th>
+  <th>level 1</th>
+  <th>level 2</th>
+  <th></th>
+</tr>
+
+{% for a in gls %}
+<tr>
+  <td>{{ a.identifier }}</td>
+  <td>{{ a.balancesheet_type }}</td>
+  <td>{{ a.asset_type }}</td>
+  <td>{{ a.asset_holder }}</td>
+  <td>{{ a.asset_source }}</td>
+  <td>{{ a.level_1_category }}</td>
+  <td>{{ a.level_2_category }}</td>
+  <td></td>
+</tr>
+{% endfor %}
+
+</table>
+
+<form action="{% url 'ledger:gls' %}" method="post">
+{% csrf_token %}
+{{ forms }}
+<input type="submit" value="Submit" />
+</form>

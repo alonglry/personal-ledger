@@ -1,0 +1,68 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+{% if device == 'phone'%}
+<head>
+	
+	<meta  http-equiv='X-UA-Compatible'  content='IE=edge,chrome=1'>
+	<meta  name='viewport'  content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'>
+	<meta  name='apple-mobile-web-app-capable'  content='yes'>
+	<meta  name='apple-mobile-web-app-status-bar-style'  content='black'>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+  <link rel="stylesheet" type="text/css" href={% static 'ledger/css/card.mobile.css' %}>
+  
+</head>
+
+<body>
+{% include "ledger/links_mobile.html" %}
+  
+<div class='card'>
+	<div class='header'><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Something is wrong</div>
+  <div class = 'message'> {{ message }} </div>	
+</div>
+    
+</body>
+  
+{% else %}
+
+<head>
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+  <link rel="stylesheet" type="text/css" href={% static 'ledger/css/error_page.desk.css' %}>
+  
+</head>
+
+<body>
+{% include "ledger/links.html" %}
+  
+<div style="    width: 45%;
+    display: inline-block;
+    margin-bottom: 1%;">
+	<form action="{% url 'ledger:sql' %}" method="post">
+		{% csrf_token %}
+		{{ textbox.non_field_errors }}
+		{{ textbox.input }}
+		<input type="submit" value="Submit" id='input1'/>
+	</form>
+</div>
+
+<div style="width: 35%;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 5%;
+    font-family: monospace;">
+	{% for a in sql %}
+		{{ a.sql }} 
+	{% endfor %}
+
+{{ error }}
+</div>
+    
+</body>
+  
+{% endif %}
+  
+</html>

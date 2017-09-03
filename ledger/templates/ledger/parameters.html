@@ -1,0 +1,29 @@
+<h1>parameters</h1>
+<table>
+<tr>
+  <th>parameter</th>
+  <th>text value 1</th>
+  <th>text value 2</th>
+  <th>number value</th>
+  <th>date value</th>
+  <th></th>
+</tr>
+
+{% for a in parameters %}
+<tr>
+  <td>{{ a.value_1 }}</td>
+  <td>{{ a.value_2 }}</td>
+  <td>{{ a.value_3 }}</td>
+  <td>{{ a.value_4 }}</td>
+  <td>{{ a.value_5 }}</td>
+  <td></td>
+</tr>
+{% endfor %}
+
+</table>
+
+<form action="{% url 'ledger:parameters' %}" method="post">
+{% csrf_token %}
+{{ forms }}
+<input type="submit" value="Submit" />
+</form>

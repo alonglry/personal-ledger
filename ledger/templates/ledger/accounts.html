@@ -1,0 +1,415 @@
+{% load verbose_names %}
+{% load calculate %}
+{% load format %}
+{% load staticfiles %}
+
+
+<!DOCTYPE html>
+{% if device == 'phone'%}
+<html>
+<head>
+	
+	<meta  http-equiv='X-UA-Compatible'  content='IE=edge,chrome=1'>
+	<meta  name='viewport'  content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'>
+	<meta  name='apple-mobile-web-app-capable'  content='yes'>
+	<meta  name='apple-mobile-web-app-status-bar-style'  content='black'>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+	
+	<style>
+body {
+	background:#f2f2f2;
+}
+
+div.company {
+    background: burlywood;
+    margin: 3%;
+    padding: 2%;
+	font-family: Roboto-Regular,HelveticaNeue,Arial,sans-serif;
+	display: block;
+	box-shadow: 5px 5px 20px darkgrey;
+}
+div.header {
+	margin-bottom: 5%;
+	padding-top: 3%;
+    padding-bottom: 3%;
+    font-size: xx-large;
+    font-family: monospace;
+    border-bottom: 1px solid beige;
+}
+div.account {
+	background: wheat;
+    width: 100%;
+    font-size: large;
+    text-align: center;
+    Roboto-Regular,HelveticaNeue,Arial,sans-serif;
+    padding: 3% 0 3% 0%;
+    line-height: 1.5;
+	margin-bottom: 5%;
+}
+div.cashflow {
+	background: cornsilk;
+	margin-bottom: 5%;
+	width: 100%;
+}
+table.cashflow, td.cashflow, tr.cashflow, th.cashflow {
+    border: 1px solid burlywood;
+	/*border-collapse: collapse;*/
+}
+table.cashflow{
+	width: 100% !important;
+    overflow: auto;
+    overflow-y: auto;
+    overflow-x: auto;
+    display: block;
+	border: 0px solid burlywood;
+	max-height: 500px;
+}
+tr.cashflow {
+	background-color: #FEFFF2;
+}
+th.cashflow {
+	font-size: medium;
+    padding: 1%;
+    font-family: monospace;
+	vertical-align: middle;
+}
+td.cashflow {
+    padding: 2% 10px 2% 10px;
+	font-size: small;
+	vertical-align: middle;
+}
+
+td.upperborder {
+	border-top: 2px solid cornsilk;
+}
+span.small {
+    font-size: xx-small;
+}
+
+td.investment {
+	padding: 0 5% 0 5%;
+}
+td.investment.left {
+	text-align: left;
+}
+td.investment.right {
+	text-align: right;
+}
+td.upperborder {
+    border-top: 2px solid beige;
+}
+</style>
+
+</head>
+
+<body>
+{% include "ledger/links_mobile.html" %}
+
+{% for a in company %}
+<div class='company'>
+	<div class='header'>{{ a.company }}</div>
+	
+	{% for b in acct %}
+	{% if b.company == a.company %}
+		<div class = 'account'>		
+			{{ b.identifier }}</br>
+			{{ b.number }}</br>
+			{{ b.status }}</br>
+			{{ b.amount }} <span class='small'>{{ b.currency }}</span>
+		</div>
+				
+			{% for c in cf %}
+			{% if c.0 == a.company and c.1 == b.identifier and c.2 %}
+				<div class = 'cashflow'>
+					<table class = 'cashflow'>
+						<tr class = 'cashflow'><th class = 'cashflow'><i class="fa fa-calendar" aria-hidden="true"></i></th>
+						{% for d in c.2 %}
+						<th class = 'cashflow'>{{ d.item }}{{ d.item|icon }}</th>
+						{% endfor %}
+						</tr>
+						{% for e in c.3 %}
+						<tr class = 'cashflow'>
+							<td class = 'small cashflow' style='white-space: nowrap;'><b>{{ e.year }} - {{ e.month }}</b></td>
+							{% for d in c.2 %}<td class = 'cashflow' style='width:100%; white-space: nowrap;'>
+								{% for f in c.4 %}
+									{% if f.year = e.year and f.month = e.month and f.item = d.item%}
+										{{ f.amount|floatformat:-2 }} <br/>
+									{% endif %}
+								{% endfor %}
+							</td>{% endfor %}
+						</tr>
+						{% endfor %}
+					</table>
+				</div>
+			{% endif %}
+			{% endfor %}
+		
+	{% endif %}
+	{% endfor %}
+</div>
+{% endfor %}
+
+{% for a in investments %}
+<div class='company'>
+	<div class='header'>{{ a.company }} {{ a.identifier }} <span style='font-size: large;'>{{ a.type }}</span></div>
+	<div class = 'account'>
+		<table style='width: 100%;'>
+			<tr><td class='investment left'>BUY</td><td class='investment left'>-{{ a.avg_buy_price|floatformat:-2 }}</td><td class='investment right'>-{{ a.paid_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td></tr>
+			<tr><td class='investment left'>SELL</td><td class='investment left'>{{ a.avg_sell_price|floatformat:-2 }}</td><td class='investment right'>{{ a.sold_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td></tr>
+			<tr><td class='investment left'>CURRENT</td><td class='investment left'>{{ a.price|floatformat:-2 }}</td><td class='investment right'>{{ a.current_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td></tr>
+			<tr><td class='investment left'></td><td class='investment left'></td><td class='investment right upperborder'>{{ a.profit_loss|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td></tr>
+			<tr><td class='investment left' colspan="2">COMMISSION</td><td class='investment right'>-{{ a.commission|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td></tr>
+			<tr><td class='investment left' colspan="2">DIVIDEND</td><td class='investment right'>{{ a.dividend|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td></tr>
+			<tr><td class='investment left' colspan="2"></td><td class='investment right upperborder'>{{ a.total_profit_loss|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td></tr>
+			<tr><td class='investment left' colspan="2">YIELD</td><td class='investment right'>{{ a.ror|floatformat:-2 }}%</td></tr>
+			<tr><td class='investment left' colspan="2">PERCENT</td><td class='investment right'>{{ a.current_amount|percentage:total_investment|floatformat:-2 }}%</td></tr>
+			<tr><td class='investment left' colspan="2">UNIT</td><td class='investment right'>{{ a.unit|floatformat:-2 }}</td></tr>
+		</table>
+	</div>
+	
+	{% for t in transaction %}
+	{% if t.1 == a.identifier %}
+	<div class = 'cashflow'>
+		<table class = 'cashflow'>
+			{% for e in t.3 %}
+			<tr class = 'cashflow'>
+				<td class = 'small cashflow' style='white-space: nowrap;'><b>{{ e.date }}</b></td>
+				<td class = 'cashflow' style='width:100%;'>
+					{% for f in t.4 %}
+						{% if f.date = e.date %}
+							<span class='small'>{{ f.transaction_type_2 }}</span> <span style='float: right;'>${{ f.amount|floatformat:-2 }} ~ {{ f.unit|floatformat:-2 }}</span><br/>
+						{% endif %}
+					{% endfor %}
+				</td>
+			</tr>
+			{% endfor %}
+		</table>
+	</div>
+	{% endif %}
+	{% endfor %}
+</div>
+{% endfor %}
+
+</body>
+</html>
+{% else %}
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+<style>
+table {
+    /*border-collapse: collapse;*/
+}
+
+table, td, th {
+    /*border: 1px solid black;*/
+}
+
+div.company {
+    display: inline-block;
+    vertical-align: top;
+    text-align: center;
+    margin: 5px;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	background: wheat;
+    padding: 5px;
+}
+
+div.account {
+    display: inline-block;
+    vertical-align: top;
+	/*margin-left: -3px;
+    margin-right: -3px;*/
+	background: cornsilk;
+}
+
+div.cashflow {
+	background: wheat;
+	margin: 10px -3px -3px -3px;
+}
+
+table.cashflow, td.cashflow, tr.cashflow {
+    /*border: 1px solid black;*/
+	/*border-collapse: collapse;*/
+	font-size: small;
+}
+
+tr.cashflow:hover {
+	background-color: #E8F0F1 !important;
+}
+
+tr.cashflow {
+	background-color: #FEFFF2;
+}
+
+td.cashflow {
+    padding: 2px 10px 2px 10px;
+}
+
+td.upperborder {
+	border-top: 2px solid wheat;
+}
+
+table.investment, td.investment, tr.investment {
+	font-size: small;
+	width: 100%;
+}
+
+div.investment {
+	display: inline-block;
+    vertical-align: top;
+	/*margin-left: -3px;
+    margin-right: -3px;*/
+	background: cornsilk;
+	width: 100%;
+}
+
+td.left {
+	text-align: left;
+}
+
+td.right {
+	text-align: right;
+}
+
+td.small, span.small {
+    font-size: xx-small;
+}
+
+</style>
+</head>
+
+<body>
+
+{% include "ledger/links.html" %}
+
+<h1>accounts</h1>
+
+<h2>cash accounts</i></h2>
+
+{% for a in company %}
+<div class='company'>
+	<table>
+		<tr><td>{{ a.company }}</td></tr>
+		<tr><td>
+		{% for b in acct %}
+		{% if b.company == a.company %}
+			<div class = 'account'>
+				<table>
+					<tr><td>{{ b.identifier }}</td></tr>
+					<tr><td>{{ b.number }}</td></tr>
+					<tr><td>{{ b.status }}</td></tr>
+					<tr><td>{{ b.amount }} <span class='small'>{{ b.currency }}</span></td></tr>
+					<tr><td>
+					{% for c in cf %}
+					{% if c.0 == a.company and c.1 == b.identifier and c.2 %}
+						<div class = 'cashflow'>
+							<table class = 'cashflow'>
+								<tr class = 'cashflow'><td class = 'cashflow'></td>
+								{% for d in c.2 %}
+								<td class = 'cashflow'>{{ d.item }}{{ d.item|icon }}</td>
+								{% endfor %}
+								</tr>
+								{% for e in c.3 %}
+								<tr class = 'cashflow'>
+									<td class = 'small cashflow'><b>{{ e.year }} - {{ e.month }}</b></td>
+									{% for d in c.2 %}<td class = 'cashflow'>
+										{% for f in c.4 %}
+											{% if f.year = e.year and f.month = e.month and f.item = d.item%}
+												{{ f.amount }} <br/>
+											{% endif %}
+										{% endfor %}
+									</td>{% endfor %}
+								</tr>
+								{% endfor %}
+							</table>
+						</div>
+					{% endif %}
+					{% endfor %}
+					</td></tr>
+				</table>
+			</div>
+		{% endif %}
+		{% endfor %}
+		</td></tr>
+	</table>
+</div>
+{% endfor %}
+
+<h2>investment products</h2>
+{% for a in investments %}
+<div class='company'>
+<table>
+<tr><td>
+		{{ a.company }} {{ a.identifier }} <span class='small'>{{ a.type }}</span>
+</td></tr>
+<tr><td>
+	<div class='investment'>
+	<table class='investment'>
+		<tr>
+			<td class='left'>BUY</td>
+			<td>-{{ a.avg_buy_price|floatformat:-2 }}</td>
+			<td class='right'>-{{ a.paid_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
+		</tr>
+		<tr>
+			<td class='left'>SELL</td>
+			<td>{{ a.avg_sell_price|floatformat:-2 }}</td>
+			<td class='right'>{{ a.sold_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
+		</tr>
+		<tr>
+			<td class='left'>CURRENT</td>
+			<td>{{ a.price|floatformat:-2 }}</td>
+			<td class='right'>{{ a.current_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
+		</tr>
+		<tr>
+			<td></td><td></td><td class='upperborder right'>{{ a.profit_loss|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
+		</tr>
+		<tr>
+			<td class='left' colspan="2">COMMISSION</td><td class='right'>-{{ a.commission|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
+		</tr>
+		<tr>
+			<td class='left' colspan="2">DIVIDEND</td><td class='right'>{{ a.dividend|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
+		</tr>
+		<tr>
+			<td></td><td></td><td class='upperborder right'>{{ a.total_profit_loss|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
+		</tr>
+		<tr>
+			<td class='left' colspan="2">YIELD</td><td class='right'>{{ a.ror|floatformat:-2 }}%</td>
+		</tr>
+		<tr>
+			<td class='left' colspan="2">PRECENT</td><td class='right'>{{ a.current_amount|percentage:total_investment }}%</td>
+		</tr>
+		<tr>
+			<td class='left' colspan="2">UNIT</td><td class='right'>{{ a.unit|floatformat:-2 }}</td>
+		</tr>	
+	</table>
+	</div>
+</td></tr>
+<tr><td>
+	{% for t in transaction %}
+	{% if t.1 == a.identifier %}
+	<table class = 'cashflow'>
+		{% for e in t.3 %}
+		<tr class = 'cashflow'>
+			<td class = 'small cashflow'><b>{{ e.date }}</b></td>
+			<td class = 'cashflow left'>
+				{% for f in t.4 %}
+					{% if f.date = e.date %}
+						<span class='small'>{{ f.transaction_type_2 }}</span> <span style='float: right;'>${{ f.amount|floatformat:-2 }} ~ {{ f.unit|floatformat:-2 }}</span><br/>
+					{% endif %}
+				{% endfor %}
+			</td>
+		</tr>
+		{% endfor %}
+	</table>
+	{% endif %}
+	{% endfor %}
+</td></tr>
+</table>
+</div>
+{% endfor %}
+
+</body>
+</html>
+{% endif %}

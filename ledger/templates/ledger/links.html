@@ -1,0 +1,33 @@
+{% load format %}
+
+<style>
+a.menu:hover {
+    color: burlywood;
+}
+a.menu {
+	-webkit-transition: color .3s,box-shadow .3s;
+    -moz-transition: color .3s,box-shadow .3s;
+    transition: color .3s,box-shadow .3s;
+	color: cornflowerblue;
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+	text-decoration:none; 
+	padding-left: 5px;
+}
+</style>
+
+
+{% if user == 'xqq' %}
+<title>&#9825 {{ user }} {{ request.path|removeslash}} </title>
+<span class='menu'>&#9825 {{ user }}</span>
+{% else %}
+<title>{{ user }}&#9732 {{ request.path|removeslash}} </title>
+<span class='menu'>{{ user }}&#9732</span>
+{% endif %}
+
+<a href="/journals" target='_blank' class='menu'>journals</a>
+<a href="/accounts" target='_blank' class='menu'>accounts</a>
+<a href="/sats" target='_blank' class='menu'>sats</a>
+<a href="/sql" target='_blank' class='menu'>SQL</a>
+<a href="/check" target='_blank' class='menu'>check</a>
+<a href="/tables" target='_blank' class='menu'>tables</a>
+<a href="/logout" class='menu'>logout</a>

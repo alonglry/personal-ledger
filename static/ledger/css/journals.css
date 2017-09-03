@@ -1,0 +1,147 @@
+body {
+	background:#f2f2f2;
+}
+
+div.form {
+    background-color: burlywood;
+    margin: 5%;
+    padding: 5%;
+	font-family: Roboto-Regular,HelveticaNeue,Arial,sans-serif;
+	display: block;
+	box-shadow: 5px 5px 20px darkgrey;
+	-webkit-transition: background-color 500ms linear;
+    -moz-transition: background-color 50ms linear;
+    -o-transition: background-color 500ms linear;
+    -ms-transition: background-color 500ms linear;
+    transition: background-color 500ms linear;
+}
+div.header {
+	margin-bottom: 5%;
+    padding-bottom: 5%;
+    font-size: xx-large;
+    font-family: monospace;
+    border-bottom: 1px solid beige;
+}
+input {
+	border: 1px solid darkgray;
+    
+    border-radius: 2px;
+    height: 40px;
+    overflow: hidden;
+    padding: 1px 6px;
+    text-align: left;
+    line-height: 30px;
+	margin: 1% 0 1% 0px;
+	font-size: 100%;
+}
+
+select {
+	border: 1px solid darkgray;
+    border-radius: 2px;
+    overflow: hidden;
+    position: relative;
+    -webkit-appearance: button;
+    list-style: none;
+    outline: none;
+    padding-left: 5px;
+    padding-right: 10%;
+    text-align: left;
+    text-decoration: none;
+    vertical-align: middle;
+    margin: 1% 0 1% 0px;
+    height: 40px;
+    line-height: 30px;
+    width: 100%;
+    background-color: white;
+    font-size: 100%;
+    background: url(https://cdn3.iconfinder.com/data/icons/pyconic-icons-2-1/512/arrow-double-up-down-128.png) no-repeat right;
+    background-size: 12%;
+	background-color: white;
+}
+
+td {
+	width: 100%;
+}
+td.middle {
+	vertical-align:middle;
+}
+
+
+div.submit {
+	margin-left: 70%;
+    margin-top: 4%;
+    border: none;
+    background: cornflowerblue;
+    border: 1px solid;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 15px;
+	text-align: center;
+	vertical-align: middle;
+}
+
+.cmn-toggle {
+  position: absolute;
+  margin-left: -9999px;
+  visibility: hidden;
+}
+.cmn-toggle + label {
+  display: block;
+  position: relative;
+  cursor: pointer;
+  outline: none;
+  user-select: none;
+}
+input.cmn-toggle-round-flat + label {
+  padding: 2px;
+  width: 70px;
+  height: 30px;
+  background-color: #dddddd;
+  border-radius: 60px;
+  transition: background 0.4s;
+	margin-top: 10px;
+    margin-bottom: 10px;
+}
+input.cmn-toggle-round-flat + label:before,
+input.cmn-toggle-round-flat + label:after {
+  display: block;
+  position: absolute;
+  content: "";
+}
+input.cmn-toggle-round-flat + label:before {
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  right: 2px;
+  background-color: #fff;
+  border-radius: 60px;
+  transition: background 0.4s;
+}
+input.cmn-toggle-round-flat + label:after {
+  top: 4px;
+  left: 4px;
+  bottom: 4px;
+  width: 30px;
+  background-color: #dddddd;
+  border-radius: 52px;
+  transition: margin 0.4s, background 0.4s;
+}
+input.cmn-toggle-round-flat:checked + label {
+  background-color: cornflowerblue;
+}
+input.cmn-toggle-round-flat:checked + label:after {
+  margin-left: 30px;
+  background-color: cornflowerblue;
+}
+
+.w100 {
+  width: 100px;
+}
+
+.w119 {
+  width: 119px;
+}
+
+.vam {
+  vertical-align:middle;
+}

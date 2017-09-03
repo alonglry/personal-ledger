@@ -1,0 +1,226 @@
+{% load staticfiles %}
+{% load format %}
+{% load calculate %}
+{% load verbose_names %}
+
+<!DOCTYPE html>
+<html>
+<head>
+
+<link rel="stylesheet" type="text/css" href={% static 'ledger/css/sats.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+
+<script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+<script src="https://code.jquery.com/ui/1.12.0/jquery-ui.js"></script>
+<script type="text/javascript" src={% static 'ledger/javascript/sats.js' %}></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+	// Submit post on submit
+	$('#post-form').on('submit', function(event){
+		alert('obobob')
+		//event.preventDefault();
+		//console.log("form submitted!")  // sanity check
+		//create_post();
+	});
+	
+	$('#source_update').keyup(function (event) {
+		alert('aok')
+	   event.preventDefault();
+		//console.log("form submitted!")  // sanity check
+		create_post();
+	 });
+	 
+	$('.update').bind('keyup', function() {
+		var _id = $(this).attr('id');
+		var _table = $(this).attr('tab');
+		var _column = $(this).attr('col');
+		var _value = $(this).val();
+		
+		delay(function(){
+			//event.preventDefault();
+			//console.log(_value)
+			create_post(_table,_id,_column,_value);
+			//$('#source_update').submit();
+		}, 1000 );
+	});
+	
+	$('.fa').not('.submit').bind('click', function() {
+		var _id = $(this).attr('id');
+		var _table = $(this).attr('tab');
+		
+		create_post(_table,_id,'','');
+	});
+	
+	$('.submit').bind('click', function() {
+		var _table = $(this).attr('tab');
+		
+		create_post(_table,'','','');
+	});
+	
+	$('input.datepicker').bind('click', function() {
+		$('div#ui-datepicker-div').css({'margin-top':'-5px',
+										'margin-left':'-35px',
+										'background-color': 'white',
+										'padding': '10px',
+										'font-family': 'monospace',
+										'border': '1px solid burlywood',
+										'border-radius': '10px'});
+	});
+	
+	$(function () {
+		$('.datepicker').datepicker({ dateFormat: 'yy-mm-dd' });
+	});
+	
+	$('input#stockpick').bind('keyup', function() {
+		var _company = $(this).val();
+		
+		//delay(function(){
+		create_stock(_company);
+		//$('ul#ui-id-1').css({'top':'620px',
+		//					  'left':'100px'});
+		//}, 1000 );
+		
+		//$.get("http://d.yimg.com/aq/autoc?query=singtel&region=SG&lang=en-US", function(data, status){
+		//	alert("Data: " + data + "\nStatus: " + status);
+		//});
+		
+	});
+	
+});
+
+$(document).ajaxComplete(function () {
+    $('.fa').not('.submit').bind('click', function() {
+		var _id = $(this).attr('id');
+		var _table = $(this).attr('tab');
+		
+		create_post(_table,_id,'','');
+	});
+	
+	//once company is chosen, click to get company name, type, ticker, price in corresponding column
+	$('.ui-menu-item-wrapper').bind('click', function() {
+		get_stock($(this).html())
+	});
+});
+</script>
+</head>
+
+<body>
+
+{% include "ledger/links.html" %}
+
+<h1>sats</h1>
+
+<h2>source</h2>
+
+{% for a in source %}
+<div class="source">
+<table>
+	<tr>
+		<td class="source">
+		{{ a.src }} 
+		{% if a.url%}<a href="{{ a.url }}" target="_blank"><i class="fa fa-link" aria-hidden="true"></i></a>{% endif %}
+		</td>
+	</tr>
+	<tr>
+		<td class="source">
+			<textarea rows="3" cols="20" class="update source" id={{ a.id }} tab="sats_source_update" col="descr">
+			{{ a.descr }}
+			</textarea>
+		</td>
+	</tr>
+	<tr>
+		<td class="source">
+		<table class="source">
+			<tr><td>total</td><td>success</td><td>fail</td></tr>
+			<tr><td>{{ a.total_count }}</td><td>{{ a.success_count }}</td><td>{{ a.fail_count }}</td></tr>
+		</table>
+		</td>
+	</tr>		
+</table>
+</div>
+{% endfor %}
+
+<div class="source" id='new'><form action="{% url 'ledger:sats' %}" method="post" autocomplete="off">
+{% csrf_token %}{{ source_form.non_field_errors }}
+<table>
+	<tr><td class="source">name</td>
+	<td class="source">{{ source_form.src|addclass:'source' }}</td></tr>
+	<tr><td class="source">description</td>
+	<td class="source">{{ source_form.descr|addclass:'source' }}</td></tr>
+	<tr><td class="source">URL</td>
+	<td class="source">{{ source_form.url|addclass:'source' }} <i class="fa fa-check-circle-o submit" aria-hidden="true" tab="sats_source_add"></i></td></tr>
+</table>
+</form></div>
+
+<h2>article</h2>
+
+<table >
+<tr>
+	<th>source</th>
+	<th>company</th>
+	<th>ticker</th>
+	<th>action</th>
+	<th>start date</th>
+	<th>initial price</th>
+	<th>status</th>
+  
+	{# current day price recorded #}
+	<th style='width: 10px;border-bottom: 0;border-top: none;'></th>
+	<th style='background-color: cadetblue;'>current price</th>
+	<th style='background-color: cadetblue;'>increase</th>
+	<th style='background-color: cadetblue;'>adjusted increase<br/>with bid/ask/commission<br/>assumption</th>
+	
+	{# lowest price recorded #}
+	<th style='width: 10px;border-bottom: 0;border-top: none;'></th>
+	<th style='background-color: cadetblue;'>low date</th>
+	<th style='background-color: cadetblue;'>low amount</th>
+	<th style='background-color: cadetblue;'>low ROR</th>
+	<th style='background-color: cadetblue;'>adjusted low ROR</th>
+  
+  	{# highest price recorded #}
+  	<th style='width: 10px;border-bottom: 0;border-top: none;'></th>
+	<th style='background-color: cadetblue;'>high date</th>
+	<th style='background-color: cadetblue;'>high amount</th>
+	<th style='background-color: cadetblue;'>high ROR</th>
+	<th style='background-color: cadetblue;'>adjusted high ROR</th>  
+</tr>
+
+{% for a in article %}
+<tr class='sats_article' id={{ a.id }}>
+	<td style="font-size: x-small;text-align: right;">{{ a.src }}</td>
+	<td nowrap style="padding: 0px 10px;">{{ a.ticker.name }}</td>
+	<td>{{ a.ticker.ticker }}</td>
+	<td></td>
+	<td>{{ a.start_date }}</td>
+	<td>{{ a.initial_price|removenone }}</td>
+	<td>{{ a.status|removenone }}</td>
+	
+	{# current day price recorded #}
+	<td style='width: 10px;border-bottom: 0;border-top: none;'></td>
+	<td>{{ a.current_price|removenone }}</td>
+	<td>{{ a.increase|floatformat:2|removenone }}%</td>
+	<td>{{ a.adj_increase|floatformat:2|removenone }}%</td>
+	
+	{# lowest price recorded #}
+	<th style='width: 10px;border-bottom: 0;border-top: none;'></th>
+	<td>{{ a.min_price_date|removenone }}</td>
+	<td>{{ a.min_price|floatformat:2|removenone }}</td>
+	<td>{{ a.low_ror|floatformat:2|removenone }}%</td>
+	<td>{{ a.adj_low_ror|floatformat:2|removenone }}%</td>
+	
+	{# highest price recorded #}
+	<th style='width: 10px;border-bottom: 0;border-top: none;'></th>
+	<td>{{ a.max_price_date|removenone }}</td>
+	<td>{{ a.max_price|floatformat:2|removenone }}</td>
+	<td>{{ a.high_ror|floatformat:2|removenone }}%</td>
+	<td>{{ a.adj_high_ror|floatformat:2|removenone }}%</td>
+</tr>
+{% endfor %}
+
+<tr>
+</tr>
+</table>
+</body>
+</html>

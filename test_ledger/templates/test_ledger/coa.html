@@ -1,0 +1,50 @@
+<h1>COA</h1>
+
+<h2>General Account List</h2>
+
+{% load verbose_names %}
+
+<table>
+<tr>
+  <th>{% get_verbose verbose 'acct' %}</th>
+  <th>{% get_verbose verbose 'bu' %}</th>
+  <th>{% get_verbose verbose 'ledger' %}</th>
+  <th>{% get_verbose verbose 'descr' %}</th>
+  <th>{% get_verbose verbose 'statement' %}</th>
+  <th>{% get_verbose verbose 'lvl2_cat' %}</th>
+  <th>{% get_verbose verbose 'lvl3_cat' %}</th>
+  <th>{% get_verbose verbose 'lvl4_cat' %}</th>
+  <th>{% get_verbose verbose 'acct_owner' %}</th>
+</tr>
+
+<form action="{% url 'test_ledger:coa' %}" method="post">
+{% csrf_token %}
+{{ coa_form.non_field_errors }}
+<tr>
+  <th>{{ coa_form.acct }}</th>
+  <th>{{ coa_form.bu }}</th>
+  <th>{{ coa_form.ledger }}</th>
+  <th>{{ coa_form.descr }}</th>
+  <th>{{ coa_form.statement }}</th>
+  <th>{{ coa_form.lvl2_cat }}</th>
+  <th>{{ coa_form.lvl3_cat }}</th>
+  <th>{{ coa_form.lvl4_cat }}</th>
+  <th>{{ coa_form.acct_owner }}</th>
+  <th><input type="submit" value="Submit" /><th>
+</form>
+
+{% for a in coa %}
+<tr>
+  <td>{{ a.acct.meta.verbose_name }}</td>
+  <td>{{ a.bu_id.meta.verbose_name }}</td>
+  <td>{{ a.ledger_id.meta.verbose_name }}</td>
+  <td>{{ a.descr.meta.verbose_name }}</td>
+  <td>{{ a.statement.meta.verbose_name }}</td>
+  <td>{{ a.lvl2_cat.meta.verbose_name }}</td>
+  <td>{{ a.lvl3_cat.meta.verbose_name }}</td>
+  <td>{{ a.lvl4_cat.meta.verbose_name }}</td>
+  <td>{{ a.acct_owner.meta.verbose_name }}</td>
+</tr>
+{% endfor %}
+
+</table>

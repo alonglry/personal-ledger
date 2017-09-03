@@ -1,0 +1,7 @@
+action,status,project,model file name,table name,verbose name,verbose name plural,ordering,definition,unicode,model form,backup,retention d,remark
+,,test_ledger,GL map,map_bu,Business Unit,Business Units,bu,Business Unit,self.bu,,,,
+,,test_ledger,GL map,map_ledger,Ledger Book,Ledger Books,ledger,Ledger Book,self.ledger,,,,
+,,test_ledger,GL map,map_acct_rollup,GL account list,GL account list,acct,ledger account listing,self.acct,Y,,,
+,,ledger,account,account_info,account detail,account details,"company,identifier",account detail,self.company + ': ' + self.identifier,Y,Y,3,
+,,ledger,cashflow,cashflow,cashflow,,"year,month",monthly P&L,str(self.year) + ' ' + str(month) + ' P&L',,Y,3,
+add,,ledger,GL,journal,journal,,,journal entries,"'%s %s' % (self.date, self.reference)",,Y,3,

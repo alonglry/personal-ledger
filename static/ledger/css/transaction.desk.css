@@ -1,0 +1,45 @@
+div.card {
+  padding: 50px;
+  font-family: Roboto-Regular,HelveticaNeue,Arial,sans-serif;
+  display: table-cell;
+    border: solid;
+}
+div.header {
+  padding: 15px 0 15px 0;
+  font-size: xx-large;
+  font-family: monospace;
+  border-bottom: 1px solid burlywood;
+}
+div.message {
+  font-size: large;
+  font-family: Roboto-Regular,HelveticaNeue,Arial,sans-serif;
+  padding: 15px 0 15px 0;
+  line-height: 1.5;
+}
+
+textarea {
+  resize: vertical;
+  height: 500px;
+  width: 500px;
+  outline: none;
+  border-right: none;
+  border-left: none;
+}
+
+input {
+    margin-top: 2%;
+    border: none;
+    background: burlywood;
+    border: 1px solid;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 15px;
+    display: block; 
+}
+
+input:hover {
+    /* color: cornflowerblue; */
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: cornflowerblue;
+}

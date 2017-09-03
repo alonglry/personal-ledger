@@ -1,0 +1,16 @@
+div.card {
+  padding: 50px;
+  font-family: Roboto-Regular,HelveticaNeue,Arial,sans-serif;
+}
+div.header {
+  padding: 15px 0 15px 0;
+  font-size: xx-large;
+  font-family: monospace;
+  border-bottom: 1px solid burlywood;
+}
+div.message {
+  font-size: large;
+  font-family: Roboto-Regular,HelveticaNeue,Arial,sans-serif;
+  padding: 15px 0 15px 0;
+  line-height: 1.5;
+}

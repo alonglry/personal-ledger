@@ -1,0 +1,30 @@
+table {
+    border-collapse: collapse;
+	/*font-family: monospace;*/
+	font-family: "Lucida Sans Unicode", "Lucida Grande", Sans-Serif;
+}
+
+table, td, th {
+    /*border: 1px solid black;*/
+}
+
+td.j {
+    background: #E4D6A7;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+td.l {
+    background: #E9B44C;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+td.a {
+    background: #9B2915;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+td.c {
+    background: #50A2A7;
+    padding-left: 10px;
+    padding-right: 10px;
+}

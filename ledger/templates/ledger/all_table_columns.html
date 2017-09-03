@@ -1,0 +1,232 @@
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href={% static 'ledger/css/tables.css' %}>
+<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+<script type="text/javascript" src="http://ajax.microsoft.com/ajax/jquery/jquery-1.4.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script type="text/javascript" src={% static 'ledger/javascript/tables.js' %}></script>
+
+<script type="text/javascript">
+$(document).ready(function(){
+
+	//update existing table or column
+	//$('input').not('.new').bind('keyup', function() {
+	$('td[contenteditable]').not('.new').bind('keyup', function() {
+		var _id = $(this).attr('id');
+		var _table = $(this).attr('tab');
+		var _column = $(this).attr('name');
+		var _value = $(this).text();
+		
+		delay(function(){
+			//event.preventDefault();
+			//console.log(_value)
+			update_post(_table,_id,_column,_value);
+			//$('#source_update').submit();
+		}, 100 );
+	});
+	
+	//create new table or column
+	$('i.submit').bind('click', function() {
+		var _table = $(this).attr('tab');
+		create_post(_table);
+	});
+	
+	//delete table or column
+	$('i.delete').bind('click', function() {
+		var _table = $(this).attr('tab');
+		var _id = $(this).attr('id');
+		
+		delete_post(_table,_id);
+	});
+	
+});
+
+$(document).ajaxComplete(function () {
+
+});
+</script>
+
+</head>
+
+<body>
+{% include "ledger/links.html" %}
+
+<div style="margin: 10px 0px;"><i class="fa fa-code" aria-hidden="true"></i></div>
+<div id = "results"></div>
+
+{% for l in list %}
+<fieldset>
+<legend>{{ l.project }} - <b>{{ l.model_file_name }}</b></legend>
+
+{% for t in tables %}
+{% if t.project = l.project and t.model_file_name = l.model_file_name %}
+
+<div class="block" id="{{ t.id }}">
+
+<table>
+<tr>
+<th nowrap style="background-color: burlywood;">project</th>
+<th nowrap>model file name</th>
+<th nowrap>table name</th>
+<th nowrap>verbose name</th>
+<th nowrap>plural</th>
+<th nowrap>ordering</th>
+<th nowrap>definition</th>
+<th nowrap>form</th>
+<th nowrap>unicode</th>
+<th nowrap>backup</th>
+<th nowrap>keep days</th>
+<td></td>
+</tr>
+<tr class="hovercolor">
+<td nowrap contenteditable id="{{ t.id }}" name="project" tab="tables">{{ t.project }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="model_file_name" tab="tables">{{ t.model_file_name }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="table_name" tab="tables" style="background-color: gainsboro;">{{ t.table_name }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="verbose_name" tab="tables">{{ t.verbose_name }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="verbose_name_plural" tab="tables">{{ t.verbose_name_plural }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="ordering" tab="tables">{{ t.ordering }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="definition" tab="tables">{{ t.definition }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="model_form" tab="tables">{{ t.model_form }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="unicode" tab="tables">{{ t.unicode }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="backup" tab="tables">{{ t.backup }}</td>
+<td nowrap contenteditable id="{{ t.id }}" name="retention_d" tab="tables">{{ t.retention_d }}</td>
+
+<!--<td nowrap><input id="{{ t.id }}" name="project" value="{{ t.project }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="model_file_name" value="{{ t.model_file_name }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="table_name" value="{{ t.table_name }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="verbose_name" value="{{ t.verbose_name }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="verbose_name_plural" value="{{ t.verbose_name_plural }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="ordering" value="{{ t.ordering }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="definition" value="{{ t.definition }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="model_form" value="{{ t.model_form }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="unicode" value="{{ t.unicode }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="backup" value="{{ t.backup }}" tab='tables'></td>
+<td nowrap><input id="{{ t.id }}" name="retention_d" value="{{ t.retention_d }}" tab='tables'></td>-->
+<td nowrap>
+<i class="fa fa-expand" aria-hidden="true" data-toggle="collapse" data-target="#{{ t.id }}.collapse" id="{{ t.id }}"></i>
+<a href="/tables/{{ t.table_name }}" target="_blank" style="color: inherit;"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+<!--<i id="{{ t.id }}" class="fa fa-trash-o delete" aria-hidden="true" tab="tables"></i>-->
+</td>
+</tr>
+</table>
+
+<div class="collapse" id="{{ t.id }}">
+</br>
+<table>
+<tr>
+<th nowrap style="background-color: gainsboro;">column name</th>
+<th nowrap>verbose name</th>
+<th nowrap>verbose name plural</th>
+<th nowrap>definition</th>
+<th nowrap>default value</th>
+<th nowrap>choice options</th>
+<th nowrap>data type</th>
+<th nowrap>min length</th>
+<th nowrap>max length</th>
+<th nowrap>decimal place</th>
+<th nowrap>path</th>
+<th nowrap>nullable</th>
+<th nowrap>blank</th>
+<th nowrap>unique key</th>
+<th nowrap>model form</th>
+<th nowrap>foreign key table</th>
+<th nowrap>foreign key column</th>
+<th nowrap>foreign key on delete</th>
+<th nowrap>auto save foreign key</th>
+</tr>
+{% for c in columns %}
+{% if c.project = t.project and c.model_file_name = t.model_file_name and c.table_name = t.table_name %}
+<tr class="hovercolor">
+<td nowrap contenteditable id="{{ c.id }}" name="column_name" tab="columns">{{ c.column_name }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="verbose_name" tab="columns">{{ c.verbose_name }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="verbose_name_plural" tab="columns">{{ c.verbose_name_plural }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="definition" tab="columns">{{ c.definition }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="default_value" tab="columns">{{ c.default_value }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="choice_options" tab="columns">{{ c.choice_options }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="data_type" tab="columns">{{ c.data_type }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="min_length" tab="columns">{{ c.min_length }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="max_length" tab="columns">{{ c.max_length }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="decimal_place" tab="columns">{{ c.decimal_place }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="path" tab="columns">{{ c.path }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="nullable" tab="columns">{{ c.nullable }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="blank" tab="columns">{{ c.blank }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="unique_key" tab="columns">{{ c.unique_key }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="model_form" tab="columns">{{ c.model_form }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="foreign_key_table" tab="columns">{{ c.foreign_key_table }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="foreign_key_column" tab="columns">{{ c.foreign_key_column }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="foreign_key_on_delete" tab="columns">{{ c.foreign_key_on_delete }}</td>
+<td nowrap contenteditable id="{{ c.id }}" name="auto_save_foreign_key" tab="columns">{{ c.auto_save_foreign_key }}</td>
+<!--<td nowrap><input id="{{ c.id }}" name="column_name" value="{{ c.column_name }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="verbose_name" value="{{ c.verbose_name }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="verbose_name_plural" value="{{ c.verbose_name_plural }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="definition" value="{{ c.definition }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="default_value" value="{{ c.default_value }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="choice_options" value="{{ c.choice_options }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="data_type" value="{{ c.data_type }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="min_length" value="{{ c.min_length }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="max_length" value="{{ c.max_length }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="decimal_place" value="{{ c.decimal_place }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="path" value="{{ c.path }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="nullable" value="{{ c.nullable }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="blank" value="{{ c.blank }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="unique_key" value="{{ c.unique_key }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="model_form" value="{{ c.model_form }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="foreign_key_table" value="{{ c.foreign_key_table }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="foreign_key_column" value="{{ c.foreign_key_column }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="foreign_key_on_delete" value="{{ c.foreign_key_on_delete }}" tab="columns"></td>
+<td nowrap><input id="{{ c.id }}" name="auto_save_foreign_key" value="{{ c.auto_save_foreign_key }}" tab="columns"></td>
+-->
+</tr>
+{% endif %}
+{% endfor %}
+</table>
+</div>
+</div>
+{% endif %}
+{% endfor %}
+
+</fieldset>
+{% endfor %}
+
+<fieldset>
+	<legend>project - model_file_name</legend>
+	<form action="{% url 'ledger:tables' %}" method="post" autocomplete="off">
+	{% csrf_token %}
+		<table>
+			<tr>
+				<th nowrap style="background-color: burlywood; width: 70px;">project</th>
+				<th nowrap style="width: 110px;">file name</th>
+				<th nowrap style="width: 110px;">table name</th>
+				<th nowrap style="width: 110px;">verbose name</th>
+				<th nowrap style="width: 110px;">plural</th>
+				<th nowrap style="width: 130px;">ordering</th>
+				<th nowrap>definition</th>
+				<th nowrap style="width: 50px;">form</th>
+				<th nowrap>unicode</th>
+				<th nowrap style="width: 60px;">backup</th>
+				<th nowrap style="width: 80px;">keep days</th>
+				<td></td>
+			</tr>
+			<tr>
+				<td nowrap><input class="new" name="project" tab='tables'></td>
+				<td nowrap><input class="new" name="model_file_name" tab='tables'></td>
+				<td nowrap><input class="new" name="table_name" tab='tables'></td>
+				<td nowrap><input class="new" name="verbose_name" tab='tables'></td>
+				<td nowrap><input class="new" name="verbose_name_plural" tab='tables'></td>
+				<td nowrap><input class="new" name="ordering" tab='tables'></td>
+				<td nowrap><input class="new" name="definition" tab='tables'></td>
+				<td nowrap><input class="new" name="model_form" tab='tables'></td>
+				<td nowrap><input class="new" name="unicode" tab='tables'></td>
+				<td nowrap><input class="new" name="backup" tab='tables'></td>
+				<td nowrap><input class="new" name="retention_d" tab='tables'></td>
+				<td><i class="fa fa-check-circle-o submit" aria-hidden="true" tab="tables"></i></td>
+			</tr>
+		</table>
+	</form>
+</fieldset>
+
+</body>
+</html>

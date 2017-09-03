@@ -1,0 +1,70 @@
+{% load format %}
+{% load calculate %}
+{% load staticfiles %}
+
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="stylesheet" type="text/css" href={% static 'ledger/css/check.css' %}>
+</head>
+<body>
+{% include "ledger/links.html" %}
+
+<h1>balance check</h1>
+
+<table>
+	<tr>
+		<th>ledger type</th>
+		<th>ledger</th>
+		<th>currency</th>
+		<th>journal</th>
+		<th>ledger</th>
+		<th>account</th>
+		<th>cashflow</th>
+	</tr>
+	
+	{% for j in journal %}<tr>
+		<td>{{ j.balancesheet_type }}</td>
+		<td>{{ j.gl_account }}</td>
+		<td>{{ j.currency }}</td>
+		<td class='j'>{{ j.amount }}</td>
+		
+		<td class='l'>{% for l in ledger %}
+			{% if l.balancesheet_type = j.balancesheet_type and l.gl_account = j.gl_account and l.currency = j.currency %}
+			{{ l.amount }}
+			{% endif %}
+		{% endfor %}</td>
+		
+		<td class='a'>{% for a in account %}
+			{% if a.company|add:' '|add:a.identifier = j.account or a.broker_company|add:' '|add:a.account = j.account and a.currency = j.currency %}
+			{{ a.amount }}
+			{% endif %}
+		{% endfor %}</td>
+		
+		<td class='c'>{% for c in cashflow %}
+			{% if c.company|add:' '|add:c.account = j.account and c.currency = j.currency %}
+			{{ c.amount }}
+			{% endif %}
+		{% endfor %}</td>
+	</tr>{% endfor %}
+	
+	{% for j in journalpl %}<tr>
+		<td>{{ j.balancesheet_type }}</td>
+		<td>{{ j.balancesheet_type }} GLs</td>
+		<td>{{ j.currency }}</td>
+		<td class='j'>{{ j.amount }}</td>
+		
+		<td class='l'>{% for l in ledgerpl %}
+			{% if l.balancesheet_type = j.balancesheet_type and l.gl_account = j.gl_account and l.currency = j.currency %}
+			{{ l.amount }}
+			{% endif %}
+		{% endfor %}</td>
+		
+		<td class='a'></td>
+		<td class='c'></td>
+	</tr>{% endfor %}
+	
+</table>
+
+</body>
+</html>

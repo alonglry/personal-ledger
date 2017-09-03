@@ -1,0 +1,21 @@
+<h1>articles</h1>
+
+{% for a in article %}
+
+<h2>{{ a.ticker.company }} ({{ a.ticker.ticker }}) - {{ a.src }}</h2>
+
+<p>{{ a.product_type }}</p>
+<p>{{ a.strategy }}</p>
+<p>{{ a.descr }}</p>
+<p><a href="{{ a.url }}" target="_blank">article</a></p>
+<p>{{ a.validation }}</p>
+<p>{{ a.start_date }}</p>
+<p>{{ a.end_date }}</p>
+<p>{{ a.ror }}</p>
+<p>{{ a.status }}</p>
+
+<img src="https://chart.finance.yahoo.com/z?s={{ a.ticker.ticker }}&t=1m&q=&l=&z=l&a=v&p=s" ><br/>
+<img src="../../static/{{ a.screenshot }}">
+
+
+{% endfor %}

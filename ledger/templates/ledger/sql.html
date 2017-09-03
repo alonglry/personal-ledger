@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+<!--codemirror-->
+<script src="http://codemirror.net/lib/codemirror.js"></script>
+<link rel="stylesheet" href="http://codemirror.net/lib/codemirror.css">
+<script src="http://codemirror.net/mode/sql/sql.js"></script>
+<script src="http://codemirror.net/addon/edit/matchbrackets.js"></script>
+<script src="http://codemirror.net/addon/hint/sql-hint.js"></script>
+<style type="text/css">.CodeMirror {border-top: 1px solid black; border-bottom: 1px solid black;}</style>
+
+<script>
+window.onload = function() {
+  var mime = 'text/x-mariadb';
+  // get mime type
+  if (window.location.href.indexOf('mime=') > -1) {
+    mime = window.location.href.substr(window.location.href.indexOf('mime=') + 5);
+  }
+  window.editor = CodeMirror.fromTextArea(document.getElementById('id_input'), {
+    mode: mime,
+    indentWithTabs: true,
+    smartIndent: true,
+    lineNumbers: true,
+    matchBrackets : true,
+    autofocus: true,
+    extraKeys: {"Ctrl-Space": "autocomplete"},
+    hintOptions: {tables: {
+      users: {name: null, score: null, birthDate: null},
+      countries: {name: null, population: null, size: null}
+    }}
+  });
+};
+</script>
+
+<style>
+table {
+    border-collapse: collapse;
+	font-family: monospace;
+}
+
+table, td, th {
+    border: 1px solid black;
+}
+
+/*
+div {
+	display: inline-block;
+    margin: 10px;
+    font-family: monospace;
+    vertical-align: middle;
+    word-wrap: break-word;
+    padding: 10px;
+}*/
+
+#input1 {
+	margin-left: 85%;
+    margin-top: 2%;
+    vertical-align: bottom;
+    border: none;
+    background: burlywood;
+    border: 1px solid;
+    color: white;
+    border-radius: 5px;
+    padding: 5px 15px;
+}
+#input1:hover {
+    /* color: cornflowerblue; */
+    cursor: pointer;
+    border-radius: 5px;
+    background-color: cornflowerblue;
+}
+#input1:focus {
+    outline: 0;
+}
+/*
+textarea {
+	border: none;
+    background-color: cornsilk;
+	padding: 20px;
+	border-bottom-right-radius: 25px;
+}
+textarea:focus {
+	outline: 0;
+}*/
+
+tr:hover {
+    background-color: #E8F0F1 !important;
+}
+</style>
+</head>
+<body>
+{% include "ledger/links.html" %}
+
+<h1>SQL</h1>
+
+<div style="    width: 45%;
+    display: inline-block;
+    margin-bottom: 1%;">
+	<form action="{% url 'ledger:sql' %}" method="post">
+		{% csrf_token %}
+		{{ textbox.non_field_errors }}
+		{{ textbox.input }}
+		<input type="submit" value="Submit" id='input1'/>
+	</form>
+</div>
+
+<div style="width: 35%;
+    display: inline-block;
+    vertical-align: top;
+    margin-left: 5%;
+    font-family: monospace;">
+	{% for a in sql %}
+		{{ a.sql }} </br>
+	{% endfor %}
+</br>
+{{ error }}
+</div>
+
+<table>
+	<tr>
+		{% for a in desc %}
+		<th nowrap>{{ a }}</th>
+		{% endfor %}
+	</tr>
+	{% for a in data %}
+	<tr onmouseover="this.style.backgroundColor='#d6e1e2c9';" onmouseout="this.style.backgroundColor='#ffffff';" style="background-color: rgb(255, 255, 255);">
+		{% for b in a %}
+		<td nowrap>{{ b }}</td>
+		{% endfor %}
+	</tr>
+	{% empty %}<p></p>
+	{% endfor %}
+</table>
+
+</body>
+</html>
