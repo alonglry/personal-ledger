@@ -116,7 +116,7 @@ td.upperborder {
 			{{ b.identifier }}</br>
 			{{ b.number }}</br>
 			{{ b.status }}</br>
-			{{ b.amount }} <span class='small'>{{ b.currency }}</span>
+			{{ b.balance }} <span class='small'>{{ b.currency }}</span>
 		</div>
 				
 			{% for c in cf %}
@@ -286,37 +286,29 @@ td.small, span.small {
 
 <h1>accounts</h1>
 
-<h2>cash accounts</i></h2>
+<h2>cash accounts</h2>
 
-{% for a in company %}
+{% for c in cf %}
 <div class='company'>
 	<table>
-		<tr><td>{{ a.company }}</td></tr>
+		<tr><td>{{ c.0.company }}</td></tr>
 		<tr><td>
-		{% for b in acct %}
-		{% if b.company == a.company %}
 			<div class = 'account'>
 				<table>
-					<tr><td>{{ b.identifier }}</td></tr>
-					<tr><td>{{ b.number }}</td></tr>
-					<tr><td>{{ b.status }}</td></tr>
-					<tr><td>{{ b.amount }} <span class='small'>{{ b.currency }}</span></td></tr>
+					<tr><td>{{ c.0.identifier }}</td></tr>
+					<tr><td>{{ c.0.number }}</td></tr>
+					<tr><td>{{ c.0.status }}</td></tr>
+					<tr><td>{{ c.0.balance }} <span class='small'>{{ c.0.currency }}</span></td></tr>
 					<tr><td>
-					{% for c in cf %}
-					{% if c.0 == a.company and c.1 == b.identifier and c.2 %}
 						<div class = 'cashflow'>
 							<table class = 'cashflow'>
-								<tr class = 'cashflow'><td class = 'cashflow'></td>
-								{% for d in c.2 %}
-								<td class = 'cashflow'>{{ d.item }}{{ d.item|icon }}</td>
-								{% endfor %}
-								</tr>
-								{% for e in c.3 %}
+								<tr class = 'cashflow'><td class = 'cashflow'></td>{% for d in c.1 %}<td class = 'cashflow'>{{ d.item }}{{ d.item|icon }}</td>{% endfor %}</tr>
+								{% for e in c.2 %}
 								<tr class = 'cashflow'>
 									<td class = 'small cashflow'><b>{{ e.year }} - {{ e.month }}</b></td>
-									{% for d in c.2 %}<td class = 'cashflow'>
-										{% for f in c.4 %}
-											{% if f.year = e.year and f.month = e.month and f.item = d.item%}
+									{% for d in c.1 %}<td class = 'cashflow'>
+										{% for f in c.3 %}
+											{% if f.year = e.year and f.month = e.month and f.item = d.item %}
 												{{ f.amount }} <br/>
 											{% endif %}
 										{% endfor %}
@@ -325,20 +317,73 @@ td.small, span.small {
 								{% endfor %}
 							</table>
 						</div>
-					{% endif %}
-					{% endfor %}
 					</td></tr>
 				</table>
 			</div>
-		{% endif %}
-		{% endfor %}
 		</td></tr>
 	</table>
 </div>
 {% endfor %}
 
 <h2>investment products</h2>
-{% for a in investments %}
+
+{% for a in transaction %}
+<div class='company'>
+	<table>
+		<tr><td>{{ a.0.company }} {{ a.0.identifier }} <span class='small'>{{ a.0.type }}</span></td></tr>
+		<tr><td>
+			<div class='investment'>
+				<table class='investment'>
+					<tr>
+						<td class='left'>BUY</td>
+						<td>-{{ a.0.avg_buy_price|floatformat:-2 }}</td>
+						<td class='right'>-{{ a.0.paid_amount|floatformat:-2 }} <span class='small'>{{ a.0.currency }}</span></td>
+					</tr>
+					<tr>
+						<td class='left'>SELL</td>
+						<td>{{ a.0.avg_sell_price|floatformat:-2 }}</td>
+						<td class='right'>{{ a.0.sold_amount|floatformat:-2 }} <span class='small'>{{ a.0.currency }}</span></td>
+					</tr>
+					<tr>
+						<td class='left'>CURRENT</td>
+						<td>{{ a.0.price|floatformat:-2 }}</td>
+						<td class='right'>{{ a.0.current_amount|floatformat:-2 }} <span class='small'>{{ a.0.currency }}</span></td>
+					</tr>
+					<tr><td></td><td></td><td class='upperborder right'>{{ a.0.profit_loss|floatformat:-2 }} <span class='small'>{{ a.0.currency }}</span></td></tr>
+					<tr><td class='left' colspan="2">COMMISSION</td><td class='right'>-{{ a.0.commission|floatformat:-2 }} <span class='small'>{{ a.0.currency }}</span></td></tr>
+					<tr><td class='left' colspan="2">DIVIDEND</td><td class='right'>{{ a.0.dividend|floatformat:-2 }} <span class='small'>{{ a.0.currency }}</span></td></tr>
+					<tr><td></td><td></td><td class='upperborder right'>{{ a.0.total_profit_loss|floatformat:-2 }} <span class='small'>{{ a.0.currency }}</span></td></tr>
+					<tr><td class='left' colspan="2">YIELD</td><td class='right'>{{ a.0.ror|floatformat:-2 }}%</td></tr>
+					<tr><td class='left' colspan="2">PRECENT</td><td class='right'>{{ a.0.current_amount|percentage:total_investment }}%</td></tr>
+					<tr><td class='left' colspan="2">UNIT</td><td class='right'>{{ a.0.unit|floatformat:-2 }}</td></tr>	
+					<tr><td colspan="3">
+						<div class = 'cashflow'>
+							<table class = 'cashflow'>
+								<tr class = 'cashflow'><td class = 'cashflow'></td>{% for d in a.1 %}<td class = 'cashflow'>{{ d.transaction_type_2 }}</td>{% endfor %}</tr>
+								{% for e in a.2 %}
+								<tr class = 'cashflow'>
+									<td class = 'small cashflow'><b>{{ e.date }}</b></td>
+									{% for d in a.1 %}<td class = 'cashflow'>
+										{% for f in a.3 %}
+											{% if f.date = e.date and f.transaction_type_2 = d.transaction_type_2 %}
+												{{ f.amount }} <br/>
+											{% endif %}
+										{% endfor %}
+									</td>{% endfor %}
+								</tr>
+								{% endfor %}
+							</table>
+						</div>
+					</td></tr>
+				</table>
+			</div>
+		</td></tr>
+	</table>
+</div>
+{% endfor %}
+	
+
+<!--{% for a in investments %}
 <div class='company'>
 <table>
 <tr><td>
@@ -409,7 +454,8 @@ td.small, span.small {
 </table>
 </div>
 {% endfor %}
-
+-->
+	
 </body>
 </html>
 {% endif %}

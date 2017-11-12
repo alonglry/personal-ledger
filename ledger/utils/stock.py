@@ -69,21 +69,34 @@ def stock_save(request,attr=''):
 # type: function
 # import by: ledger/models/account
 #            ledger/models/sats
+#						 ledger/views/accounts
 # use: get stock price
 ##############################################################
 # version author description                      date
 # 1.0     awai   initial release                  02/02/2017
+# 1.1     awai   getting price use pandas         12/11/2017
 ##############################################################
 def get_price(ticker):
 	if str(ticker) == '(u\'\',)':
 		price = None
 	else:
-		price = Share(t(ticker)).get_price()
+		#price = Share(t(ticker)).get_price()
+		import pandas as pd
+		import pandas.io.data as web 
+		
+		start = datetime(2017,11,1)
+		end = date.today()
+ 		
+		try:
+			s = web.DataReader(t(ticker), "google", start, end)
+			price = s['Close'][len(s)-1]
+		except:
+			price = 0
 	
 	if price == None:
 		price = 0
 	else:
-		price = float(price)
+		price = round(float(price),2)
 	return price
 	
 def t(ticker):

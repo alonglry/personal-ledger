@@ -44,7 +44,7 @@ def f(cashflow,x):
 	d = cashflow[0]['date']
 	
 	for c in cashflow:
-		r = r + float(c['amount']) * (1+x) ** ((c['date'] - d).total_seconds()/60/60/24/365)
+		r = r + float(c['amount']) * (1+x+ 0j) ** ((c['date'] - d).total_seconds()/60/60/24/365)
 		
 	return r
 	

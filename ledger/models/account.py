@@ -46,7 +46,7 @@ class account_info(models.Model):
 			.annotate(amount = Sum('amount'))
 	
 			return a
-	        '''
+			'''
 				l = []
 				for aa in a:
 					l.append([aa.company + ' ' + aa.identifier,aa.currency,aa.amount])
@@ -77,6 +77,13 @@ class account_info(models.Model):
 				r.save()
 			except:
 				1==1
+	
+	@property
+	def balance(self):
+		from ledger.models import cashflow
+		balance = cashflow.objects.filter(account_info = self).aggregate(Sum('amount'))['amount__sum']
+		
+		return balance
 
 class account_info_form(ModelForm):
 	class Meta:
@@ -118,6 +125,7 @@ class cashflow(models.Model):
 	journal_id = models.CharField('journal ID',max_length=100,null=True,blank=True)
 	detail = models.CharField('detail',max_length=200,null=True,blank=True)
 	mode = models.CharField('mode',max_length=50,null=True,blank=True)
+	account_info = models.ForeignKey('account_info',on_delete=models.CASCADE,verbose_name='account information')
 
 	def __unicode__(self):
 			return str(self.year) + '-' + str(self.month) + ' ' + self.company + ' ' + self.account + ' ' + self.item
@@ -191,6 +199,7 @@ class cashflow_m(models.Model):
 	journal_id = models.CharField(max_length=100,null=True,blank=True)
 	detail = models.CharField(max_length=200,null=True,blank=True)
 	mode = models.CharField(max_length=50,null=True,blank=True)
+	account_info_id = models.IntegerField(null=True,blank=True)
 	bk_date = models.DateField()
 
 ###end of cashflow###
@@ -422,6 +431,7 @@ class investment_transaction(models.Model):
 	journal_id = models.CharField('journal ID',max_length=100,null=True,blank=True)
 	owner = models.CharField('owner',max_length=50)
 	remark = models.CharField('remark',max_length=500,null=True,blank=True)
+	investment_info = models.ForeignKey('investment_info',on_delete=models.CASCADE,verbose_name='investment information')
 	mode = models.CharField('mode',max_length=50,null=True,blank=True)
 
 	def __unicode__(self):
@@ -439,26 +449,13 @@ class investment_transaction(models.Model):
 				
 	@classmethod	
 	def add(self,d,i,t1,t2,u,p,a,c,j,user,m=None,b=None,acc=None):
-		self.objects.create(date = d,
-					  identifier = i,
-		      transaction_type_1 = t1,
-			  transaction_type_2 = t2,
-				  		    unit = u,
-						   price = p,
-						  amount = a,
-					    currency = c,
-				      journal_id = j,
-					       owner = user,
-	                        mode = m,
-	              broker_company = b,
-	                     account = acc)
+		self.objects.create(date = d,identifier = i,transaction_type_1 = t1,transaction_type_2 = t2,unit = u,price = p,amount = a,currency = c,journal_id = j,owner = user,mode = m,broker_company = b,account = acc)
 						  
 	@classmethod
 	def get_transaction(self,attr='',para=''):
 		if attr == 'all':
 			l = []
 			for p in para:
-	            
 				try:
 					c = str(p['company'])
 				except:
@@ -498,6 +495,7 @@ class investment_transaction_m(models.Model):
 	journal_id = models.CharField(max_length=100,null=True,blank=True)
 	owner = models.CharField(max_length=50,null=True,blank=True)
 	remark = models.CharField(max_length=500,null=True,blank=True)
+	investment_info_id = models.IntegerField(null=True,blank=True)
 	mode = models.CharField(max_length=50,null=True,blank=True)
 	bk_date = models.DateField()
 

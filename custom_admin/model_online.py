@@ -92,11 +92,17 @@ class Models_f:
 			tmp = tmp.replace('# to be imported','# to be imported\n' + tmp2)
 			writefile(self.project,'__init__.py',tmp)
 
-##
-## class: all_table_columns object
-## parameter: all_table_columns data, table name, all_table_columns field list
-## last update: 05/11/2016
-## 	
+####################################################################################################################
+# name: models_c
+# type: class
+# import by: na
+# use: main view module for accounts page
+####################################################################################################################
+# version author	description                      																												date
+# 1.0     awai		initial release                  																												05/11/2016
+# 1.1     awai		remove ,to_field='" + str(a[col_list.index('foreign key column')]) + " in foreignkey		18/10/2017
+# 1.2			awai		fix m table foreignkey issue																														18/10/2017
+####################################################################################################################
 		
 class Models_c:
 	
@@ -114,12 +120,13 @@ class Models_c:
 				self.form = self.form + "'%s'," % a[col_list.index('column name')]
 		
 			#backup model columns
-			self.type = self.setType(a[col_list.index('data type')])
 			
 			if a[col_list.index('foreign key table')] <> '':
 				self.name = a[col_list.index('column name')] + '_id'
+				self.type = 'IntegerField'
 			else:
 				self.name = a[col_list.index('column name')]
+				self.type = self.setType(a[col_list.index('data type')])
 				
 			tmp = '\t' + self.name + ' = models.' + self.type + '('
 			
@@ -139,7 +146,7 @@ class Models_c:
 			tmp = '\t' + a[col_list.index('column name')] + ' = models.'
 			
 			if a[col_list.index('foreign key table')] <> '':
-				tmp = tmp + "ForeignKey('" + str(a[col_list.index('foreign key table')]) + "',to_field='" + str(a[col_list.index('foreign key column')]) + "',on_delete=models." + str(a[col_list.index('foreign key on delete')]) + ','
+				tmp = tmp + "ForeignKey('" + str(a[col_list.index('foreign key table')]) + "',on_delete=models." + str(a[col_list.index('foreign key on delete')]) + ','
 				
 				#if a[col_list.index('auto save foreign key')] == 'Y':
 				#	self.save = self.save + '\t\t' + a[col_list.index('foreign key table')] + '.objects.get_or_create(' + a[col_list.index('foreign key column')] + '=self.' +a[col_list.index('foreign key column')]

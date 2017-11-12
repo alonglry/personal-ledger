@@ -36,5 +36,11 @@ def icon(value):
 		return mark_safe(' <i class="fa fa-plane" aria-hidden="true"></i>')
 	elif value in ('4G'):
 		return mark_safe(' <i class="fa fa-mobile" aria-hidden="true"></i>')
+	elif value in ('F&B'):
+		return mark_safe(' <i class="fa fa-cutlery" aria-hidden="true"></i>')
+	elif value in ('housing'):
+		return mark_safe(' <i class="fa fa-home" aria-hidden="true"></i>')
+	elif value in ('transport'):
+		return mark_safe(' <i class="fa fa-taxi" aria-hidden="true"></i>')
 	else:
 		return ''

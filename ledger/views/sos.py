@@ -1,11 +1,13 @@
 import datetime
 from random import randint
 from django.http import HttpResponse, HttpResponseRedirect
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django import forms	
 
 from ..models import investment_info,investment_transaction,journal,ledger,parameter,cashflow
 from django.contrib.auth.models import User
+from ledger.utils import user_name, device
 
 #############################################################
 # name: dbs_sos_journal_form
@@ -42,34 +44,56 @@ class dbs_sos_journal_form(forms.Form):
 ##############################################################
 
 def sos_handler(request):
+	
+	try:
+		d = device(request)
+	except Exception as err:
+		return render(request,'ledger/error_page.html',{'device':'phone','message':err.args[0]})	
+
+	try:
+		user = user_name(request)
+	except Exception as err:
+		return render(request,'ledger/error_page.html',{'device':d,'message':err.args[0]})
+	
 	if request.method == 'POST':
-		#return HttpResponse('Hello World')
+		
+		error = ''
 		
 		#get variables
-		user = User.objects.get(username=request.user.username).first_name
-		choice = request.POST.get('choice','')
-		ticker = 'SOS'
-		date = request.POST.get('date','')
-		jrnl = 'SOS' + str(randint(0,99999))
-		sign = -1 if choice == 'sell' or choice == 'dividend' else 1
-		
-		i_info_1 = investment_info.get_shares_info(ticker,user)
-		i_info_pre = investment_info.get_shares_info(ticker,user)
+		try:
+			choice = request.POST.get('choice','')
+			date = request.POST.get('date','')
+			jrnl = 'SOS' + str(randint(0,99999))
+			sign = -1 if choice == 'sell' or choice == 'dividend' else 1
+		except:
+			error = error + '\nget variables error'
+			
+		try:		
+			ii = investment_info.objects.get(identifier='SOS',owner=user)
+			#i_info_pre = investment_info.objects.get(identifier='SOS',owner=user)
+		except:
+			error = error + '\nget investment_info error'
+			
+		try:
+			it = investment_transaction.objects.filter(investment_info = ii)
+		except:
+			error = error = '\nget investment_transaction error'
 		
 		if choice == 'buy' or choice == 'sell':
 			amount = abs(float(request.POST.get('amount','')))
 			unit = abs(float(request.POST.get('unit','')))
-			total_unit = float(i_info_1.unit) + unit * sign
+			total_unit = float(ii.unit) + unit * sign
 		elif choice == 'dividend':
 			amount = abs(float(request.POST.get('amount','')))
-			unit = float(i_info_1.unit)
-			total_unit = float(i_info_1.unit)
-		
-		error = ''
+			unit = float(ii.unit)
+			total_unit = float(ii.unit)
 				
 		#update source
-		error = error + transaction_update(choice,'SOS',date,amount,unit,total_unit,'SGD',jrnl,user)
-		error = error + info_update(choice,'SOS',user,amount,unit,'SGD')
+		try:
+			transaction_update(ii,it,choice,'SOS',date,amount,unit,total_unit,'SGD',jrnl,user)
+		except:
+			error = error + '\ninsert investment_transaction error'
+		#error = error + info_update(choice,'SOS',user,amount,unit,'SGD')
 		
 		'''
 		#update journal
@@ -92,7 +116,7 @@ def sos_handler(request):
 	else:
 		return HttpResponseRedirect(reverse('ledger:journals'))
 		
-def transaction_update(ac,ticker,date,amount,unit,total_unit,currency,jrnl,user):
+def transaction_update(ii,it,ac,ticker,date,amount,unit,total_unit,currency,jrnl,user):
 	error = ''
 	
 	#get variables
@@ -135,16 +159,16 @@ def transaction_update(ac,ticker,date,amount,unit,total_unit,currency,jrnl,user)
 		if ac == 'buy':
 			#clear previous sell simulation
 			if mode == 'test':
-				investment_transaction.objects.filter(identifier='SOS',owner=user,transaction_type_1='simulating').exclude(mode=mode).transaction_type_1 = 'simulating_test'
-				investment_transaction.clear_simulation(ticker,user,mode)				
+				it.filter(transaction_type_1 = 'simulating').exclude(mode=mode).transaction_type_1 = 'simulating_test'
+				it.filter(transaction_type_1 = 'simulating',mode = 'test').delete()
 			else:
-				investment_transaction.clear_simulation(ticker,user,mode)
+				it.filter(transaction_type_1 = 'simulating').delete()
 			#add actual transaction -- self paid money
-			investment_transaction.add(date,ticker,'actual',ac,u1,p1,a1,currency,jrnl,user,mode,'DBS','SOS')
+			investment_transaction.objects.create(date = date,investment_info = ii,transaction_type_1 = 'actual',transaction_type_2 = 'buy',unit = u1,price = p1,amount = a1,currency = 'SGD',mode = mode,broker_company = 'DBS',account = 'SOS')
 			#add actual transaction -- company compensation
-			investment_transaction.add(date,ticker,'actual','compensation',u2,p2,a2,currency,jrnl,user,mode,'DBS','SOS')
+			investment_transaction.objects.create(date = date,investment_info = ii,transaction_type_1 = 'actual',transaction_type_2 = 'compensation',unit = u2,price = p2,amount = a2,currency = 'SGD',mode = mode,broker_company = 'DBS',account = 'SOS')
 			#add new sell simulation
-			investment_transaction.add(date,ticker,'simulating','sell',u3,p3,a3,currency,jrnl,user,mode,'DBS','SOS')
+			investment_transaction.objects.create(date = date,investment_info = ii,transaction_type_1 = 'simulating',transaction_type_2 = 'sell',unit = u3,price = p3,amount = a3,currency = 'SGD',mode = mode,broker_company = 'DBS',account = 'SOS')
 		elif ac == 'sell':
 			#clear previous sell simulation
 			investment_transaction.clear_simulation(ticker,user,mode)
@@ -154,16 +178,9 @@ def transaction_update(ac,ticker,date,amount,unit,total_unit,currency,jrnl,user)
 			investment_transaction.add(date,ticker,'simulating','sell',u2,p2,a2,currency,jrnl,user,mode,'DBS','SOS')
 		elif ac == 'dividend':
 			#add actual transaction
-			investment_transaction.add(date,ticker,'actual',ac,u1,p1,a1,currency,jrnl,user,mode,'DBS','SOS')
+			investment_transaction.objects.create(date = date,investment_info = ii,transaction_type_1 = 'actual',transaction_type_2 = 'dividend',unit = u1,price = p1,amount = a1,currency = 'SGD',mode = mode,broker_company = 'DBS',account = 'SOS')
 	except:
 		error = error + '\ninsert transaction: insert investment transaction error'
-		
-	#insert cashflow
-	try:
-		if ac == 'sell':
-			cashflow.add(date,'POSB','savings','investment',user,a1,'SGD',jrnl,mode)
-	except:
-		error = error + '\ninsert transaction: insert cashflow error'
 		
 	return error
 			

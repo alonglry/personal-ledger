@@ -38,30 +38,10 @@
 <body>
 {% include "ledger/links.html" %}
   
-<div style="    width: 45%;
-    display: inline-block;
-    margin-bottom: 1%;">
-	<form action="{% url 'ledger:sql' %}" method="post">
-		{% csrf_token %}
-		{{ textbox.non_field_errors }}
-		{{ textbox.input }}
-		<input type="submit" value="Submit" id='input1'/>
-	</form>
+<div class='card'>
+	<div class='header'><i class="fa fa-exclamation-triangle" aria-hidden="true"></i> Something is wrong</div>
+  <div class = 'message'> {{ message }} </div>	
 </div>
-
-<div style="width: 35%;
-    display: inline-block;
-    vertical-align: top;
-    margin-left: 5%;
-    font-family: monospace;">
-	{% for a in sql %}
-		{{ a.sql }} 
-	{% endfor %}
-
-{{ error }}
-</div>
-    
-</body>
   
 {% endif %}
   

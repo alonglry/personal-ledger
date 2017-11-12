@@ -5,12 +5,7 @@
 {% if device == 'phone'%}
 <head>
 	
-	<meta  http-equiv='X-UA-Compatible'  content='IE=edge,chrome=1'>
-	<meta  name='viewport'  content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'>
-	<meta  name='apple-mobile-web-app-capable'  content='yes'>
-	<meta  name='apple-mobile-web-app-status-bar-style'  content='black'>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
-	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+	{% include "ledger/meta_mobile.html" %}	
   <link rel="stylesheet" type="text/css" href={% static 'ledger/css/card.mobile.css' %}>
   
 </head>
@@ -31,7 +26,28 @@
 	
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
 	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+	<script type="text/javascript" src={% static 'ledger/javascript/transaction.js' %}></script>
   <link rel="stylesheet" type="text/css" href={% static 'ledger/css/transaction.desk.css' %}>
+	
+	<script type="text/javascript">
+		
+	$(document).ready(function(){
+
+		//submit transition
+		$('div.submit').bind('click', function() {
+			var _id = $(this).attr('id');
+			var _c = $(this).html()
+			save(_id,_c);
+		});
+
+
+	});
+
+	$(document).ajaxComplete(function () {
+
+	});
+
+	</script>
   
 </head>
 
@@ -39,18 +55,13 @@
 {% include "ledger/links.html" %}
   
 <div class='card'>
-	<form action="{% url 'ledger:transaction' %}" method="post">
-		{% csrf_token %}
-		{{ textbox.non_field_errors }}
-		{{ textbox.input }}
-		<input type="submit" value="Submit"/>
-	</form>
+	{{ textbox.input }}
+	<div class='submit' id='upload'>POSB</div>
+	<div class='submit' id='upload'>Citi</div>
 </div>
   
 <div class='card'>
-  <p>
-    some
-  </p>
+  <span id='message'></span>
 </div>
     
 </body>
