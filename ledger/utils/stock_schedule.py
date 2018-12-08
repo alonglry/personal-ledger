@@ -116,6 +116,53 @@ def update_stock_value_others(ticker,date,share):
 	
 	result = sqlexecute(sql)
 
+################################################################
+# name: get_stock
+# type: function
+# import by:
+#
+# use: get stock Date,Open,High,Low,Close,Adj.close,Volume as a
+#      dictionary, return dummy if values cannot be found
+#      this function is to be run in server
+################################################################
+# version author description                          date
+# 1.0     awai   initial release                      29/02/2018
+################################################################
+
+def get_stock(ticker):
+	import csv
+	import urllib2
+	from datetime import datetime,date
+	
+	try:
+		url = 'https://query1.finance.yahoo.com/v7/finance/download/'+ticker+'?interval=1d&events=history&crumb=e07PO/.pmsl'
+		req = urllib2.Request(url=url,data=b'None',headers={'User-Agent':' Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0'})
+		response = urllib2.urlopen(req)
+		read = csv.reader(response)
+
+		for row in read:
+			p = row
+
+		a = {'date':datetime.strptime(p[0],'%Y-%m-%d'),'open':float(p[1]),'high':float(p[2]),'low':float(p[3]),'close':float(p[4]),'adj_close':float(p[5]),'volume':float(p[6]),'status':'success'}
+	except:
+		a = {'date':date.today(),'open':0.0,'high':0.0,'low':0.0,'close':0.0,'adj_close':0.0,'volume':0.0,'status':'fail'}
+		
+	return a
+
+################################################################
+# name: upadte
+# type: function
+# import by:
+#
+# use: upadte stock_value table
+#      this function is to be run in server
+################################################################
+# version author description                          date
+# 1.0     awai   initial release                      19/02/2017
+# 1.1     awai   change method getting values         29/01/2018
+################################################################
+
+'''
 def update():
 	for r in get_tickers():
 		ticker,share,today = r[0],Share(r[0]),get_date()
@@ -149,6 +196,33 @@ def update():
 					print '%s has been updated close for %s.' % (ticker,today)
 			else:
 				print '%s has no trading on %s.' % (ticker,today)
-		
+'''
+
+def update():
+	companies = sqlexecute('SELECT DISTINCT id, ticker FROM ledger_stock_company;')
 	
+	for r in companies:
+		id,ticker,share = r[0],r[1],get_stock(r[1])
+		
+		if share['status'] == 'success':
+			sql = "INSERT INTO ledger_stock_value (tickerdate,ticker_id,date,open,high,low,close,adj_close,volume)"
+			sql = sql + " VALUES ('%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (ticker+'_'+share['date'].strftime('%Y-%m-%d'),ticker,share['date'].strftime('%Y-%m-%d'),share['open'],share['high'],share['low'],share['close'],share['adj_close'],share['volume'])
+			sql = sql + " ON DUPLICATE KEY UPDATE open='%s',high='%s',low='%s',close='%s',adj_close='%s',volume='%s';" % (share['open'],share['high'],share['low'],share['close'],share['adj_close'],share['volume'])
+			
+			print "update ('%s','%s','%s','%s','%s','%s','%s','%s','%s')" % (ticker+'_'+share['date'].strftime('%Y-%m-%d'),ticker,share['date'].strftime('%Y-%m-%d'),share['open'],share['high'],share['low'],share['close'],share['adj_close'],share['volume'])
+			
+			result = sqlexecute(sql)
+
+################################################################
+# name: upadte
+# type: task
+# import by: /home/alonglry/.virtualenvs/django18/bin/python /home/alonglry/personal_finance/ledger/utils/stock_schedule.py
+#            daily at 1:10
+#
+# use: tigger update function
+################################################################
+# version author description                          date
+# 1.0     awai   initial release                      19/02/2017
+################################################################
+print '/ledger/utils/sats_schedule.py/'
 update()

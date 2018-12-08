@@ -18,6 +18,7 @@ from django.db.models import F,Sum,Avg,Max,Min
 # 1.1			awai		use basic-nonpost-post structure		15/10/2017
 # 1.2     awai    update cashflow logic								23/10/2017
 # 1.3			awai		update investment transaction logic	12/11/2017
+# 1.4			awai    remove investment                   26/11/
 ################################################################
 
 @login_required(login_url='/login/')
@@ -78,6 +79,7 @@ def accounts(request):
 		except:
 			error = error + '\ncashflow prepare data having issue.'
 		
+		'''
 		#get investment info
 		try:
 			ii = investment_info.objects.filter(owner=user).exclude(identifier = '')
@@ -114,26 +116,24 @@ def accounts(request):
 
 		try:
 			
-			sum = 0
-			
 			for a in ii:
 				u = float(a.unit)
 				p = float(a.price)
 				
 				sum = sum + u * p
-				
+			
 		except:
 			error = error + '\ninvestment info get total sum having issue.'
-
+		'''
 		if error == '':
 			return render(request,'ledger/accounts.html',{'acct':ai.order_by('company','identifier'),
 																								 'company':ai.values('company').distinct(),
-																									 	  'cf':l1,
-																						 'investments':ii,
-																						 'transaction':l2,
-																										'user':user,
-																				'total_investment':sum,
-																									'device':d
+																									 	  'cf':l1 
+																						# 'investments':ii,
+																						# 'transaction':l2,
+																						#				'user':user,
+																			#	'total_investment':sum,
+																				#					'device':d
 															})
 		else:
 			#return HttpResponse(error)

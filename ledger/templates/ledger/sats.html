@@ -4,6 +4,193 @@
 {% load verbose_names %}
 
 <!DOCTYPE html>
+{% if device == 'phone'%}
+
+<html>
+<head>
+	
+	<meta  http-equiv='X-UA-Compatible'  content='IE=edge,chrome=1'>
+	<meta  name='viewport'  content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0'>
+	<meta  name='apple-mobile-web-app-capable'  content='yes'>
+	<meta  name='apple-mobile-web-app-status-bar-style'  content='black'>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/font-awesome.min.css' %}>
+	<link rel="stylesheet" type="text/css" href={% static 'ledger/css/sats.mobile.css' %}>
+	<link rel="stylesheet" type="text/css" href="http://idangero.us/swiper/dist/css/swiper.min.css">
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src={% static 'ledger/javascript/sats.mobile.js' %}></script>
+	
+	<style>
+		html, body {
+      position: relative;
+      height: 100%;
+			margin: 0px;
+			padding: 0px;
+    }
+		
+		.swiper-container {
+			width: 100%;
+			height: 100%;
+		}
+		.swiper-slide {
+			padding: 10px;
+			height: 100%;
+			padding: 0px;
+			overflow:scroll;
+			/* 
+			text-align: center;
+			font-size: 18px;
+			background: #fff;
+
+			display: -webkit-box;
+			display: -ms-flexbox;
+			display: -webkit-flex;
+			display: flex;
+			-webkit-box-pack: center;
+			-ms-flex-pack: center;
+			-webkit-justify-content: center;
+			justify-content: center;
+			-webkit-box-align: center;
+			-ms-flex-align: center;
+			-webkit-align-items: center;
+			align-items: center;
+			*/
+		}
+		.swiper-slide-active {
+			padding: 0px;
+		}
+		.swiper-slide-next {
+			padding: 0px;
+		}
+	</style>
+	
+</head>
+	
+<body>
+	
+	<div id="mySidenav" class="sidenav">
+		<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+		<input type="text" id="sideSource" placeholder="Source">
+		<div id="sideSource"></div>
+		<input type="text" id="sideStock" placeholder="Company">
+		<div id="sideStock"></div>
+		<span id="sideButton">SAVE</span>
+	</div>
+	
+	<div class="navbar"  style="display: none;">
+		<ul class="nav navbar-nav">
+			{% for s in source %}
+				<li><a href="#{{ s.id }}">{{ s.id }}</a></li>
+			{% endfor %}
+		</ul>
+	</div>  
+	
+	<div class="swiper-container" id="main">
+		
+		<div class="navbar"  style="display: none;">
+			<ul class="nav navbar-nav">
+				{% for s in source %}
+					<li><a href="#{{ s.id }}">{{ s.id }}</a></li>
+				{% endfor %}
+			</ul>
+		</div>
+		
+		<div class="swiper-wrapper" id='myScrollspy' data-spy="scroll" data-target=".navbar">
+			{% for s in source %}
+				<div class="swiper-slide" id="{{ s.id }}"> 
+					<span class='sidesign' onclick="openNav()">&#9776;</span>
+					<span class='src' id="{{ s.id }}">{{ s.src }}</span>
+					<span class='desrc'>{{ s.descr }}</span>
+					<a href="{{ s.url }}" target="_blank"><i class="fa fa-external-link" aria-hidden="true"></i></a>
+					<div class="content" id="{{ s.id }}"></div>
+				</div>
+			{% endfor %}
+		</div>
+
+		<div class="swiper-pagination"></div>
+		
+	</div>
+
+	<script src="http://idangero.us/swiper/dist/js/swiper.min.js"></script>
+
+	<script>
+		var swiper = new Swiper('.swiper-container', {
+			direction: 'vertical',
+			pagination: {
+				el: '.swiper-pagination',
+				clickable: true,
+			},
+		});
+		
+		function openNav() {
+				document.getElementById("mySidenav").style.width = "250px";
+				document.getElementById("main").style.marginLeft = "250px";
+				//document.body.style.backgroundColor = "rgba(0,0,0,0.4)";
+		}
+
+		function closeNav() {
+				document.getElementById("mySidenav").style.width = "0";
+				document.getElementById("main").style.marginLeft= "0";
+				document.body.style.backgroundColor = "white";
+		}
+		
+		$('span.src').on('click',function(){
+			var s = $(this).attr('id')
+			create_post('sats_get_article',s,'','');
+		});
+		
+		$('input#sideSource').on('keyup',function(){
+			var s = $(this).val();
+			create_post('sats_get_source',s,'','');
+		})
+		
+		$('input#sideStock').on('keyup',function(){
+			var s = $(this).val();
+			create_post('sats_get_stock',s,'','');
+		})
+		
+		$('span#sideButton').on('click',function(){
+			var s = $('input#sideSource').val();
+			var v = $('input#sideStock').val();
+			
+			if (s.length == 0) {
+				$('input#sideSource').val('Source missing');
+			}
+			if (v.length == 0) {
+				$('input#sideStock').val('Stock missing');
+			}
+			
+			if (s.length != 0 && v.length !=0 ) {
+				create_post('sats_create_article',s,v,'');
+			}
+			
+		})
+		
+		$('div#sideSource').on('click','span.sideSource',function(){
+			$('input#sideSource').val($(this).html());
+			$('div#sideSource').html('');
+		})
+		
+		$('div#sideStock').on('click','p.sideStock',function(){
+			//$('input#sideStock').val($(this).attr('id'));
+			$('input#sideStock').val($(this).text());
+			$('div#sideStock').html('');
+		})
+		
+		$(document).ready(function(){
+				$("body").on("activate.bs.scrollspy", function(){
+						//alert('ox');
+				})
+		});							
+		
+
+	</script>
+	
+</body>
+	
+</html>
+
+{% else %}
 <html>
 <head>
 
@@ -26,8 +213,8 @@ $(document).ready(function(){
 	});
 	
 	$('#source_update').keyup(function (event) {
-		alert('aok')
-	   event.preventDefault();
+		//alert('aok')
+	  //event.preventDefault();
 		//console.log("form submitted!")  // sanity check
 		create_post();
 	 });
@@ -222,5 +409,12 @@ $(document).ajaxComplete(function () {
 <tr>
 </tr>
 </table>
+	
+	
+	<input class="" id="stockpick" maxlength="200" name="some">
+	
+	
 </body>
 </html>
+
+{% endif %}

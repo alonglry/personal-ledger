@@ -1,4 +1,6 @@
 {% load staticfiles %}
+{% load format %}
+{% load calculate %}
 
 <!DOCTYPE html>
 <html>
@@ -53,11 +55,31 @@
 
 <body>
 {% include "ledger/links.html" %}
+	
+<div class='cashflow'>
+	<table class='cashflow'>
+		<tr class = 'cashflow'><td class = 'cashflow'></td>{% for d in cashflow.0 %}<td class = 'cashflow'>{{ d.item }}{{ d.item|icon }}</td>{% endfor %}</tr>
+		{% for e in cashflow.1 %}
+		<tr class = 'cashflow'>
+			<td class = 'small cashflow'>{{ e.year }} - {{ e.month }}</td>
+			{% for d in cashflow.0 %}<td class = 'cashflow'>
+				{% for f in cashflow.2 %}
+					{% if f.year = e.year and f.month = e.month and f.item = d.item %}
+						{{ f.amount|floatformat:-2 }} <br/>
+					{% endif %}
+				{% endfor %}
+			</td>{% endfor %}
+		</tr>
+		{% endfor %}
+	</table>
+</div>
+
   
 <div class='card'>
 	{{ textbox.input }}
 	<div class='submit' id='upload'>POSB</div>
 	<div class='submit' id='upload'>Citi</div>
+	<div class='submit' id='upload'>CPF</div>
 </div>
   
 <div class='card'>

@@ -71,9 +71,9 @@ class sats_article(models.Model):
 		verbose_name = 'stock article tracking article'
 
 	date = models.DateField('date',null=True,blank=True)
-	src = models.ForeignKey('sats_source',to_field='src',on_delete=models.PROTECT,verbose_name='source')
-	ticker = models.ForeignKey('stock_company',to_field='ticker',on_delete=models.PROTECT,verbose_name='ticker')
-	strategy = models.ForeignKey('stock_strategy',to_field='strategy',on_delete=models.PROTECT,null=True,blank=True,verbose_name='strategy')
+	src = models.ForeignKey('sats_source',on_delete=models.CASCADE,verbose_name='source')
+	ticker = models.ForeignKey('stock_company',on_delete=models.CASCADE,verbose_name='ticker')
+	strategy = models.ForeignKey('stock_strategy',on_delete=models.CASCADE,null=True,blank=True,verbose_name='strategy')
 	start_date = models.DateField('start date',null=True,blank=True)
 	end_date = models.DateField('end date',null=True,blank=True)
 	initial_price = models.DecimalField('initial price',max_digits=9,decimal_places=4,null=True,blank=True)
@@ -200,9 +200,9 @@ class sats_article_form(ModelForm):
 
 class sats_article_m(models.Model):
 	date = models.DateField(null=True,blank=True)
-	src_id = models.CharField(max_length=100,null=True,blank=True)
-	ticker_id = models.CharField(max_length=100,null=True,blank=True)
-	strategy_id = models.CharField(max_length=500,null=True,blank=True)
+	src_id = models.IntegerField(null=True,blank=True)
+	ticker_id = models.IntegerField(null=True,blank=True)
+	strategy_id = models.IntegerField(null=True,blank=True)
 	start_date = models.DateField(null=True,blank=True)
 	end_date = models.DateField(null=True,blank=True)
 	initial_price = models.DecimalField(max_digits=9,decimal_places=4,null=True,blank=True)

@@ -325,6 +325,7 @@ td.small, span.small {
 </div>
 {% endfor %}
 
+<!--
 <h2>investment products</h2>
 
 {% for a in transaction %}
@@ -366,7 +367,7 @@ td.small, span.small {
 									{% for d in a.1 %}<td class = 'cashflow'>
 										{% for f in a.3 %}
 											{% if f.date = e.date and f.transaction_type_2 = d.transaction_type_2 %}
-												{{ f.amount }} <br/>
+												{{ f.amount|floatformat:-2 }} ~ {{ f.unit|floatformat:-2 }} <br/>
 											{% endif %}
 										{% endfor %}
 									</td>{% endfor %}
@@ -379,79 +380,6 @@ td.small, span.small {
 			</div>
 		</td></tr>
 	</table>
-</div>
-{% endfor %}
-	
-
-<!--{% for a in investments %}
-<div class='company'>
-<table>
-<tr><td>
-		{{ a.company }} {{ a.identifier }} <span class='small'>{{ a.type }}</span>
-</td></tr>
-<tr><td>
-	<div class='investment'>
-	<table class='investment'>
-		<tr>
-			<td class='left'>BUY</td>
-			<td>-{{ a.avg_buy_price|floatformat:-2 }}</td>
-			<td class='right'>-{{ a.paid_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
-		</tr>
-		<tr>
-			<td class='left'>SELL</td>
-			<td>{{ a.avg_sell_price|floatformat:-2 }}</td>
-			<td class='right'>{{ a.sold_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
-		</tr>
-		<tr>
-			<td class='left'>CURRENT</td>
-			<td>{{ a.price|floatformat:-2 }}</td>
-			<td class='right'>{{ a.current_amount|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
-		</tr>
-		<tr>
-			<td></td><td></td><td class='upperborder right'>{{ a.profit_loss|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
-		</tr>
-		<tr>
-			<td class='left' colspan="2">COMMISSION</td><td class='right'>-{{ a.commission|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
-		</tr>
-		<tr>
-			<td class='left' colspan="2">DIVIDEND</td><td class='right'>{{ a.dividend|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
-		</tr>
-		<tr>
-			<td></td><td></td><td class='upperborder right'>{{ a.total_profit_loss|floatformat:-2 }} <span class='small'>{{ a.currency }}</span></td>
-		</tr>
-		<tr>
-			<td class='left' colspan="2">YIELD</td><td class='right'>{{ a.ror|floatformat:-2 }}%</td>
-		</tr>
-		<tr>
-			<td class='left' colspan="2">PRECENT</td><td class='right'>{{ a.current_amount|percentage:total_investment }}%</td>
-		</tr>
-		<tr>
-			<td class='left' colspan="2">UNIT</td><td class='right'>{{ a.unit|floatformat:-2 }}</td>
-		</tr>	
-	</table>
-	</div>
-</td></tr>
-<tr><td>
-	{% for t in transaction %}
-	{% if t.1 == a.identifier %}
-	<table class = 'cashflow'>
-		{% for e in t.3 %}
-		<tr class = 'cashflow'>
-			<td class = 'small cashflow'><b>{{ e.date }}</b></td>
-			<td class = 'cashflow left'>
-				{% for f in t.4 %}
-					{% if f.date = e.date %}
-						<span class='small'>{{ f.transaction_type_2 }}</span> <span style='float: right;'>${{ f.amount|floatformat:-2 }} ~ {{ f.unit|floatformat:-2 }}</span><br/>
-					{% endif %}
-				{% endfor %}
-			</td>
-		</tr>
-		{% endfor %}
-	</table>
-	{% endif %}
-	{% endfor %}
-</td></tr>
-</table>
 </div>
 {% endfor %}
 -->

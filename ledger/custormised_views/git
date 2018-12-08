@@ -1,0 +1,8 @@
+git add -u :/ adds all modified file changes to the stage git add * :/ adds modified and any new files (that's not gitignore'ed) to the stage
+git commit -m "update on 29/01/201"
+git push
+
+git add a
+git commit a -m "bugfix, in a"
+git add b
+git commit b -m "new feature, in b"

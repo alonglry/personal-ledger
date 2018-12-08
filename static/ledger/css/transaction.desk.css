@@ -50,3 +50,33 @@ div.submit:hover {
     border-radius: 5px;
     border: 1px solid;
 }
+
+table.cashflow, td.cashflow, tr.cashflow {
+    /*border: 1px solid black;*/
+	/*border-collapse: collapse;*/
+	font-size: small;
+  width: 100%;
+}
+
+tr.cashflow:hover {
+	background-color: #E8F0F1 !important;
+}
+
+tr.cashflow {
+	background-color: #FEFFF2;
+}
+
+td.cashflow {
+  padding: 2px 10px 2px 10px;
+  width: 50px;
+}
+
+div.cashflow {
+  background: wheat;
+  margin-top: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  display: inline-block;
+  vertical-align: top;
+  text-align: center;
+}

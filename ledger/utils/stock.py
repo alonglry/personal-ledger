@@ -64,42 +64,105 @@ def stock_save(request,attr=''):
 		if form.is_valid():
 			form.save()		
 
-##############################################################
+################################################################
 # name: get_price
 # type: function
 # import by: ledger/models/account
 #            ledger/models/sats
 #						 ledger/views/accounts
-# use: get stock price
-##############################################################
-# version author description                      date
-# 1.0     awai   initial release                  02/02/2017
-# 1.1     awai   getting price use pandas         12/11/2017
-##############################################################
-def get_price(ticker):
-	if str(ticker) == '(u\'\',)':
-		price = None
-	else:
+#            ledger/views/sats
+# use: get stock adj_close price and return as float for given
+#      date. If no date given, get stock adj_close price for
+#      current date. if stock not exists or no trading, throw 
+#      RemoteDataError.
+################################################################
+# version author description                          date
+# 1.0     awai   initial release                      02/02/2017
+# 1.1     awai   getting price use pandas             12/11/2017
+# 1.1     awai   throw IO error if ticker not found   19/11/2017
+# 1.2     awai   getting price use urllib2				    26/11/2017
+# 1.3     awai   getting price use pandas             27/12/2017
+################################################################
+def get_price(ticker,d = None):
+
+	'''
+	try:
 		#price = Share(t(ticker)).get_price()
 		import pandas as pd
-		import pandas.io.data as web 
+		#import pandas.io.data as web 
+		import pandas_datareader.data as web
 		
 		start = datetime(2017,11,1)
 		end = date.today()
- 		
-		try:
-			s = web.DataReader(t(ticker), "google", start, end)
-			price = s['Close'][len(s)-1]
-		except:
-			price = 0
+		s = web.DataReader(t(ticker), "google", start, end)
+		price = s['Close'][len(s)-1]
+		
+		return price
+	except:
+		
+	try:
+		import csv
+		import urllib2
+		url = 'https://query1.finance.yahoo.com/v7/finance/download/'+t(ticker)+'?interval=1d&events=history&crumb=e07PO/.pmsl'
+		req = urllib2.Request(url=url,data=b'None',headers={'User-Agent':' Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0'})
+		response = urllib2.urlopen(req)
+		read = csv.reader(response)
+
+		for row in read:
+			p = row
+
+		price = float(p[5])
+
+		return price
+			
+	except:		
+		raise IOError(ticker + ' not found using either pandas or urilib2.    ' + url)
+	'''
+
+	from datetime import date
+	import pandas as pd
+	import pandas_datareader.data as web
+	from pandas_datareader._utils import RemoteDataError
 	
-	if price == None:
-		price = 0
+	if d == None:
+		day = date.today()
 	else:
-		price = round(float(price),2)
-	return price
+		day = d
+	
+	try:
+		df = web.DataReader(ticker, "yahoo", day,day)
+	except RemoteDataError as err:
+		raise RemoteDataError(err)
+	
+	return float(df.tail(1).iloc[:,0:].values[0][4])
 	
 def t(ticker):
 	st = str(ticker)
 	st = st.replace("(u'",'').replace("',)",'')
 	return st
+
+################################################################
+# name: get_stock
+# type: function
+# import by: ledger/models/sats
+#
+# use: get stock Date,Open,High,Low,Close,Adj.close,Volume as a
+#      dictionary
+################################################################
+# version author description                          date
+# 1.0     awai   initial release                      29/02/2018
+################################################################
+
+def get_stock(ticker):
+	import csv
+	import urllib2
+	url = 'https://query1.finance.yahoo.com/v7/finance/download/'+ticker+'?interval=1d&events=history&crumb=e07PO/.pmsl'
+	req = urllib2.Request(url=url,data=b'None',headers={'User-Agent':' Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0'})
+	response = urllib2.urlopen(req)
+	read = csv.reader(response)
+
+	for row in read:
+		p = row
+
+	a = {'date':datetime.strptime(p[0],'%Y-%m-%d'),'open':float(p[1]),'high':float(p[2]),'low':float(p[3]),'close':float(p[4]),'adj_close':float(p[5]),'volume':float(p[6])}
+	return a
